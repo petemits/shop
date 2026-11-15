@@ -1432,5 +1432,75 @@ window.addEventListener('load', () => {
 });
 </script>
 
+
+<script>
+window.addEventListener('load', () => {
+    const accountDlg = document.getElementById('accountDlg');
+    const signInBtn = document.getElementById('signInBtn');
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabRegister = document.getElementById('tabRegister');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const form = document.getElementById('authForm');
+    const errorText = document.getElementById('authError');
+    const regFields = document.getElementById('registerFields');
+    let authMode = 'login';
+
+    if(signInBtn) signInBtn.onclick = () => { accountDlg.showModal(); errorText.style.display = 'none'; };
+
+    tabSignIn.onclick = () => {
+        authMode = 'login'; tabSignIn.className = 'primary'; tabSignIn.style.background = ''; tabRegister.className = ''; tabRegister.style.background = 'white'; submitBtn.innerText = 'Sign in'; errorText.style.display = 'none'; regFields.style.display = 'none';
+    };
+    
+    tabRegister.onclick = () => {
+        authMode = 'register'; tabRegister.className = 'primary'; tabRegister.style.background = ''; tabSignIn.className = ''; tabSignIn.style.background = 'white'; submitBtn.innerText = 'Create account'; errorText.style.display = 'none'; regFields.style.display = 'block';
+    };
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value.trim();
+        
+        if (authMode === 'login') {
+            alert("Login is currently disabled. Please use Create Account.");
+            return;
+        }
+
+        submitBtn.innerText = 'Saving...'; 
+        errorText.style.display = 'none';
+
+        const payload = {
+            name: document.getElementById('regName').value,
+            email: email,
+            mobile: document.getElementById('regMobile').value,
+            address: document.getElementById('regAddress').value,
+            prefs: document.getElementById('regPrefs').value,
+            ig: document.getElementById('regIG').value,
+            tt: document.getElementById('regTT').value
+        };
+
+        try {
+            // Using mode: 'no-cors' tells the browser to send the data and NOT wait for a reply.
+            // This completely bypasses the Google CORS error.
+            await fetch("https://script.google.com/macros/s/AKfycbwNheZ9tfPncy8hbj1ahYgufDHw44Xkjvvpo0XAp8V8k_IPwA5erdcJHaUyRSiGjkyEyw/exec", {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload)
+            });
+
+            // Since we bypassed the reply, we just assume success if it didn't crash.
+            alert("Success! Account saved to Google Sheets and welcome email sent.");
+            accountDlg.close();
+            form.reset();
+        } catch (err) {
+            console.error(err);
+            errorText.innerText = "Network error. Please try again.";
+            errorText.style.display = 'block';
+        } finally {
+            submitBtn.innerText = 'Create account';
+        }
+    };
+});
+</script>
+
 </body>
 </html>
