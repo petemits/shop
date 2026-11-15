@@ -1,0 +1,1239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>iBiz Gadget Shop — order by e-transfer</title>
+<style>
+  :root{--bg:#faf7f0;--surface:#fff;--alt:#f3eee2;--ink:#1c1917;--dim:#6f6a5e;--border:#e3dcc9;--green:#14532d;--amber:#b45309;--radius:14px}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;gap:8px;align-items:center;z-index:5}
+  header .brand{flex:1;min-width:0} header .brand b{font-size:20px;display:block} header .brand span{font-size:12px;color:var(--dim)}
+  button{cursor:pointer;border-radius:999px;border:1px solid var(--border);background:var(--surface);padding:8px 14px;font-size:14px;min-height:36px}
+  button.primary{background:var(--green);color:#fff;border-color:var(--green);font-weight:700}
+  main{max-width:1100px;margin:0 auto;padding:16px}
+  .banner{background:var(--green);color:#fff;border-radius:var(--radius);padding:20px}
+  .banner h1{margin:0 0 8px;font-size:26px;line-height:1.25}
+  .banner p{margin:0;opacity:.92;font-size:14px;max-width:640px}
+  .banner .row{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .banner a.call,.banner a.text{border:1px solid #ffffffaa;color:#fff;border-radius:999px;padding:8px 16px;text-decoration:none;font-weight:700}
+  .banner button.demo{background:#fff;color:var(--green);border:none;font-weight:800}
+  .banner .contactline{margin-top:12px;font-size:13px;opacity:.92}
+  .banner .contactline a{color:#fff}
+  .tiers{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:16px}
+  .tiers h2{margin:0 0 8px;font-size:18px} .tiers p{margin:6px 0;font-size:14px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 10px}
+  .controls input[type=search]{flex:1;min-width:200px;border-radius:999px;border:1px solid var(--border);padding:9px 16px;font-size:16px;background:var(--surface)}
+  .controls select{border-radius:999px;border:1px solid var(--border);padding:8px 12px;background:var(--surface)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .chips button[aria-pressed=true]{background:var(--green);color:#fff;border-color:var(--green)}
+  .tierfilter{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:4px 0 8px;font-size:14px}
+  .tierfilter button[aria-pressed=true]{background:var(--amber);color:#fff;border-color:var(--amber)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:10px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+  .card img{width:100%;aspect-ratio:1;object-fit:cover;background:var(--alt);cursor:pointer}
+  .card .body{padding:12px;display:flex;flex-direction:column;gap:4px;flex:1}
+  .card h3{margin:0;font-size:16px} .card p{margin:0;font-size:13px;color:var(--dim)}
+  .card .pitch{font-size:13px;color:var(--ink);font-style:italic}
+  .card .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:8px}
+  .price{font-size:22px;font-weight:800;color:var(--amber)}
+  .tierbadge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;border-radius:999px;padding:3px 9px;background:var(--alt);color:var(--green);border:1px solid var(--border)}
+  .tierbadge.premium{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+  .tierbadge.mid{background:#dbeafe;color:#1e40af;border-color:#93c5fd}
+  .qty{display:flex;align-items:center;gap:6px} .qty button{width:34px;padding:0;font-size:18px;font-weight:700}
+  .detailsbtn{margin-top:8px;width:100%}
+  dialog{border:1px solid var(--border);border-radius:16px;max-width:640px;width:94vw;max-height:92vh;overflow:auto}
+  dialog::backdrop{background:#0008}
+  label{display:block;font-size:14px;font-weight:600;margin-top:10px}
+  label input,label select{width:100%;margin-top:4px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg);font-size:16px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+  .scrollx{overflow-x:auto}
+  .ok{background:var(--alt);border-radius:var(--radius);padding:14px}
+  .etransfer{border:2px solid var(--amber);border-radius:var(--radius);padding:14px;margin-top:10px}
+  footer{max-width:1100px;margin:0 auto;padding:10px 16px 40px;color:var(--dim);font-size:13px}
+  .gallery{margin:10px 0}
+  .gallery .main{width:100%;aspect-ratio:1;object-fit:contain;background:var(--alt);border-radius:12px;border:1px solid var(--border)}
+  .gallery .main.view-close{object-fit:cover;object-position:center 25%}
+  .gallery .main.view-detail{object-fit:cover;object-position:center 75%}
+  .gallery .views{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .gallery .views button[aria-pressed=true]{background:var(--green);color:#fff;border-color:var(--green)}
+  .gallery .note{font-size:12px;color:var(--dim);margin-top:6px}
+  .detail h2{margin:0 0 4px;font-size:22px}
+  .detail .bigprice{font-size:28px;font-weight:800;color:var(--amber)}
+  .detail h3{margin:18px 0 6px;font-size:16px}
+  .detail p{font-size:14px;margin:6px 0}
+  .detail .spec{font-size:14px}
+  .detail .spec b{display:inline-block;min-width:110px}
+  .compare div,.relgrid{display:flex;flex-direction:column;gap:6px}
+  .compare button,.relgrid button{display:flex;justify-content:space-between;gap:8px;text-align:left;border-radius:10px}
+  .relgrid button img{width:44px;height:44px;object-fit:cover;border-radius:8px}
+  .relgrid button span{flex:1}
+  .how,.talk{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-top:28px}
+  .how h2,.talk h2{margin:0 0 8px;font-size:18px} .how p,.talk p{margin:6px 0;font-size:14px}
+  .talk a{color:var(--green);font-weight:700}
+
+  
+  /* --- INTERNAL LOOPING ANIMATIONS --- */
+  .banner { animation: bannerPulse 5s infinite alternate ease-in-out; }
+  @keyframes bannerPulse {
+    0% { box-shadow: 0 0 10px rgba(20, 83, 45, 0.1); }
+    100% { box-shadow: 0 0 25px rgba(20, 83, 45, 0.4); }
+  }
+
+  .tiers { animation: tiersBob 6s infinite ease-in-out; }
+  @keyframes tiersBob {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* --- STAGGERED INTERNAL FLOW (Controlled by JS) --- */
+  @keyframes flowIn {
+    from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  @keyframes textBreathe {
+    0% { opacity: 0.9; }
+    50% { opacity: 1; }
+    100% { opacity: 0.9; }
+  }
+
+  /* By default, hide the children so they don't flash before animating */
+  .banner h1, .banner p, .banner .row,
+  .tiers h2, .tiers p {
+    opacity: 0;
+  }
+
+  /* When the .flow-active class is present, animate the children */
+  .flow-active h1, .flow-active p, .flow-active .row {
+    animation: flowIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, textBreathe 5s infinite ease-in-out 1s;
+  }
+  .flow-active h1 { animation-delay: 0.1s, 1s; }
+  .flow-active p:nth-of-type(1) { animation-delay: 0.3s, 1s; }
+  .flow-active .row { animation-delay: 0.5s, 1s; }
+  .flow-active p:nth-of-type(2) { animation-delay: 0.7s, 1s; }
+
+  .flow-active h2 { animation-delay: 0.2s, 1.5s; }
+  .flow-active p:nth-of-type(1) { animation-delay: 0.4s, 1.5s; }
+  .flow-active p:nth-of-type(2) { animation-delay: 0.5s, 1.5s; }
+  .flow-active p:nth-of-type(3) { animation-delay: 0.6s, 1.5s; }
+  .flow-active p:nth-of-type(4) { animation-delay: 0.7s, 1.5s; }
+  .flow-active p:nth-of-type(5) { animation-delay: 0.8s, 1.5s; }
+
+
+  /* Modern UI Overrides */
+  :root {
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 10px 20px rgba(0,0,0,0.08);
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  body { -webkit-font-smoothing: antialiased; }
+
+  /* Hover Effects */
+  .card { box-shadow: var(--shadow-sm); transition: var(--transition-smooth); border: 1px solid transparent; }
+  .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: var(--border); }
+  .card img { transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
+  .card:hover img { transform: scale(1.06); }
+  button, .primary { transition: var(--transition-smooth); }
+  button:active { transform: scale(0.96); }
+
+  /* --- CONTINUOUS BACKGROUND ANIMATIONS --- */
+  .banner { animation: bannerPulse 5s infinite alternate ease-in-out; }
+  @keyframes bannerPulse {
+    0% { box-shadow: 0 0 10px rgba(20, 83, 45, 0.1); }
+    100% { box-shadow: 0 0 25px rgba(20, 83, 45, 0.4); }
+  }
+  .tiers { animation: tiersBob 6s infinite ease-in-out; }
+  @keyframes tiersBob {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* --- OUTER CARD ANIMATIONS (Including 3D Rotations) --- */
+  @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+  @keyframes rotateIn { from { opacity: 0; transform: rotate(-3deg) scale(0.95); } to { opacity: 1; transform: rotate(0) scale(1); } }
+  
+  /* NEW: 3D Flip (Y-Axis) */
+  @keyframes flipIn { from { opacity: 0; transform: perspective(600px) rotateY(90deg); } to { opacity: 1; transform: perspective(600px) rotateY(0); } }
+  /* NEW: 360 Spin */
+  @keyframes spin360 { from { opacity: 0; transform: rotate(180deg) scale(0.8); } to { opacity: 1; transform: rotate(0) scale(1); } }
+
+  .animate-slide-up { animation: slideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-slide-left { animation: slideLeft 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-slide-right { animation: slideRight 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-zoom { animation: zoomIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-rotate { animation: rotateIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-flip { animation: flipIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-spin360 { animation: spin360 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+  /* --- INTERNAL TEXT FLOW (For Banner & Tiers) --- */
+  @keyframes flowIn {
+    from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  @keyframes textBreathe { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
+
+  /* By default, hide internal elements */
+  .banner h1, .banner p, .banner .row,
+  .tiers h2, .tiers p { opacity: 0; }
+
+  /* When .flow-active is added, trigger the internal flow */
+  .flow-active h1, .flow-active p, .flow-active .row {
+    animation: flowIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, textBreathe 5s infinite ease-in-out 1s;
+  }
+  .flow-active h1 { animation-delay: 0.1s, 1s; }
+  .flow-active p:nth-of-type(1) { animation-delay: 0.3s, 1s; }
+  .flow-active .row { animation-delay: 0.5s, 1s; }
+  .flow-active p:nth-of-type(2) { animation-delay: 0.7s, 1s; }
+  .flow-active h2 { animation-delay: 0.2s, 1.5s; }
+  .flow-active p:nth-of-type(3) { animation-delay: 0.4s, 1.5s; }
+  .flow-active p:nth-of-type(4) { animation-delay: 0.5s, 1.5s; }
+  .flow-active p:nth-of-type(5) { animation-delay: 0.6s, 1.5s; }
+  .flow-active p:nth-of-type(6) { animation-delay: 0.7s, 1.5s; }
+  .flow-active p:nth-of-type(7) { animation-delay: 0.8s, 1.5s; }
+
+</style>
+
+<style>
+  
+
+  
+  /* --- INTERNAL LOOPING ANIMATIONS --- */
+  .banner { animation: bannerPulse 5s infinite alternate ease-in-out; }
+  @keyframes bannerPulse {
+    0% { box-shadow: 0 0 10px rgba(20, 83, 45, 0.1); }
+    100% { box-shadow: 0 0 25px rgba(20, 83, 45, 0.4); }
+  }
+
+  .tiers { animation: tiersBob 6s infinite ease-in-out; }
+  @keyframes tiersBob {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* --- STAGGERED INTERNAL FLOW (Controlled by JS) --- */
+  @keyframes flowIn {
+    from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  @keyframes textBreathe {
+    0% { opacity: 0.9; }
+    50% { opacity: 1; }
+    100% { opacity: 0.9; }
+  }
+
+  /* By default, hide the children so they don't flash before animating */
+  .banner h1, .banner p, .banner .row,
+  .tiers h2, .tiers p {
+    opacity: 0;
+  }
+
+  /* When the .flow-active class is present, animate the children */
+  .flow-active h1, .flow-active p, .flow-active .row {
+    animation: flowIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, textBreathe 5s infinite ease-in-out 1s;
+  }
+  .flow-active h1 { animation-delay: 0.1s, 1s; }
+  .flow-active p:nth-of-type(1) { animation-delay: 0.3s, 1s; }
+  .flow-active .row { animation-delay: 0.5s, 1s; }
+  .flow-active p:nth-of-type(2) { animation-delay: 0.7s, 1s; }
+
+  .flow-active h2 { animation-delay: 0.2s, 1.5s; }
+  .flow-active p:nth-of-type(1) { animation-delay: 0.4s, 1.5s; }
+  .flow-active p:nth-of-type(2) { animation-delay: 0.5s, 1.5s; }
+  .flow-active p:nth-of-type(3) { animation-delay: 0.6s, 1.5s; }
+  .flow-active p:nth-of-type(4) { animation-delay: 0.7s, 1.5s; }
+  .flow-active p:nth-of-type(5) { animation-delay: 0.8s, 1.5s; }
+
+
+  /* Modern UI Overrides */
+  :root {
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 10px 20px rgba(0,0,0,0.08);
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  body { -webkit-font-smoothing: antialiased; }
+
+  /* Hover Effects */
+  .card { box-shadow: var(--shadow-sm); transition: var(--transition-smooth); border: 1px solid transparent; }
+  .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: var(--border); }
+  .card img { transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
+  .card:hover img { transform: scale(1.06); }
+  button, .primary { transition: var(--transition-smooth); }
+  button:active { transform: scale(0.96); }
+
+  /* --- CONTINUOUS BACKGROUND ANIMATIONS --- */
+  .banner { animation: bannerPulse 5s infinite alternate ease-in-out; }
+  @keyframes bannerPulse {
+    0% { box-shadow: 0 0 10px rgba(20, 83, 45, 0.1); }
+    100% { box-shadow: 0 0 25px rgba(20, 83, 45, 0.4); }
+  }
+  .tiers { animation: tiersBob 6s infinite ease-in-out; }
+  @keyframes tiersBob {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* --- OUTER CARD ANIMATIONS (Including 3D Rotations) --- */
+  @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+  @keyframes rotateIn { from { opacity: 0; transform: rotate(-3deg) scale(0.95); } to { opacity: 1; transform: rotate(0) scale(1); } }
+  
+  /* NEW: 3D Flip (Y-Axis) */
+  @keyframes flipIn { from { opacity: 0; transform: perspective(600px) rotateY(90deg); } to { opacity: 1; transform: perspective(600px) rotateY(0); } }
+  /* NEW: 360 Spin */
+  @keyframes spin360 { from { opacity: 0; transform: rotate(180deg) scale(0.8); } to { opacity: 1; transform: rotate(0) scale(1); } }
+
+  .animate-slide-up { animation: slideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-slide-left { animation: slideLeft 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-slide-right { animation: slideRight 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-zoom { animation: zoomIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-rotate { animation: rotateIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-flip { animation: flipIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-spin360 { animation: spin360 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+  /* --- INTERNAL TEXT FLOW (For Banner & Tiers) --- */
+  @keyframes flowIn {
+    from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  @keyframes textBreathe { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
+
+  /* By default, hide internal elements */
+  .banner h1, .banner p, .banner .row,
+  .tiers h2, .tiers p { opacity: 0; }
+
+  /* When .flow-active is added, trigger the internal flow */
+  .flow-active h1, .flow-active p, .flow-active .row {
+    animation: flowIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, textBreathe 5s infinite ease-in-out 1s;
+  }
+  .flow-active h1 { animation-delay: 0.1s, 1s; }
+  .flow-active p:nth-of-type(1) { animation-delay: 0.3s, 1s; }
+  .flow-active .row { animation-delay: 0.5s, 1s; }
+  .flow-active p:nth-of-type(2) { animation-delay: 0.7s, 1s; }
+  .flow-active h2 { animation-delay: 0.2s, 1.5s; }
+  .flow-active p:nth-of-type(3) { animation-delay: 0.4s, 1.5s; }
+  .flow-active p:nth-of-type(4) { animation-delay: 0.5s, 1.5s; }
+  .flow-active p:nth-of-type(5) { animation-delay: 0.6s, 1.5s; }
+  .flow-active p:nth-of-type(6) { animation-delay: 0.7s, 1.5s; }
+  .flow-active p:nth-of-type(7) { animation-delay: 0.8s, 1.5s; }
+
+</style>
+
+
+<style>
+  
+  /* Modern UI Overrides */
+  :root {
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 10px 20px rgba(0,0,0,0.08);
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  body { -webkit-font-smoothing: antialiased; }
+
+  /* Hover Effects */
+  .card { box-shadow: var(--shadow-sm); transition: var(--transition-smooth); border: 1px solid transparent; }
+  .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: var(--border); }
+  .card img { transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
+  .card:hover img { transform: scale(1.06); }
+  button, .primary { transition: var(--transition-smooth); }
+  button:active { transform: scale(0.96); }
+
+  /* --- CONTINUOUS BACKGROUND ANIMATIONS --- */
+  .banner { animation: bannerPulse 5s infinite alternate ease-in-out; }
+  @keyframes bannerPulse {
+    0% { box-shadow: 0 0 10px rgba(20, 83, 45, 0.1); }
+    100% { box-shadow: 0 0 25px rgba(20, 83, 45, 0.4); }
+  }
+  .tiers { animation: tiersBob 6s infinite ease-in-out; }
+  @keyframes tiersBob {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* --- OUTER CARD ANIMATIONS (Including 3D Rotations) --- */
+  @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+  @keyframes rotateIn { from { opacity: 0; transform: rotate(-3deg) scale(0.95); } to { opacity: 1; transform: rotate(0) scale(1); } }
+  
+  /* NEW: 3D Flip (Y-Axis) */
+  @keyframes flipIn { from { opacity: 0; transform: perspective(600px) rotateY(90deg); } to { opacity: 1; transform: perspective(600px) rotateY(0); } }
+  /* NEW: 360 Spin */
+  @keyframes spin360 { from { opacity: 0; transform: rotate(180deg) scale(0.8); } to { opacity: 1; transform: rotate(0) scale(1); } }
+
+  .animate-slide-up { animation: slideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-slide-left { animation: slideLeft 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-slide-right { animation: slideRight 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-zoom { animation: zoomIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-rotate { animation: rotateIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-flip { animation: flipIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-spin360 { animation: spin360 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+  /* --- INTERNAL TEXT FLOW (For Banner & Tiers) --- */
+  @keyframes flowIn {
+    from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  @keyframes textBreathe { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
+
+  /* By default, hide internal elements */
+  .banner h1, .banner p, .banner .row,
+  .tiers h2, .tiers p { opacity: 0; }
+
+  /* When .flow-active is added, trigger the internal flow */
+  .flow-active h1, .flow-active p, .flow-active .row {
+    animation: flowIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, textBreathe 5s infinite ease-in-out 1s;
+  }
+  .flow-active h1 { animation-delay: 0.1s, 1s; }
+  .flow-active p:nth-of-type(1) { animation-delay: 0.3s, 1s; }
+  .flow-active .row { animation-delay: 0.5s, 1s; }
+  .flow-active p:nth-of-type(2) { animation-delay: 0.7s, 1s; }
+  .flow-active h2 { animation-delay: 0.2s, 1.5s; }
+  .flow-active p:nth-of-type(3) { animation-delay: 0.4s, 1.5s; }
+  .flow-active p:nth-of-type(4) { animation-delay: 0.5s, 1.5s; }
+  .flow-active p:nth-of-type(5) { animation-delay: 0.6s, 1.5s; }
+  .flow-active p:nth-of-type(6) { animation-delay: 0.7s, 1.5s; }
+  .flow-active p:nth-of-type(7) { animation-delay: 0.8s, 1.5s; }
+
+</style>
+
+
+<style>
+  
+  /* Modern UI Overrides */
+  :root {
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-md: 0 10px 20px rgba(0,0,0,0.08);
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  body { -webkit-font-smoothing: antialiased; }
+
+  /* Hover Effects */
+  .card { box-shadow: var(--shadow-sm); transition: var(--transition-smooth); border: 1px solid transparent; }
+  .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: var(--border); }
+  .card img { transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); }
+  .card:hover img { transform: scale(1.06); }
+  button, .primary { transition: var(--transition-smooth); }
+  button:active { transform: scale(0.96); }
+
+  /* --- CONTINUOUS BACKGROUND ANIMATIONS --- */
+  .banner { animation: bannerPulse 5s infinite alternate ease-in-out; }
+  @keyframes bannerPulse {
+    0% { box-shadow: 0 0 10px rgba(20, 83, 45, 0.1); }
+    100% { box-shadow: 0 0 25px rgba(20, 83, 45, 0.4); }
+  }
+  .tiers { animation: tiersBob 6s infinite ease-in-out; }
+  @keyframes tiersBob {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+  }
+
+  /* --- OUTER CARD ANIMATIONS (Including 3D Rotations) --- */
+  @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideRight { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+  @keyframes rotateIn { from { opacity: 0; transform: rotate(-3deg) scale(0.95); } to { opacity: 1; transform: rotate(0) scale(1); } }
+  
+  /* NEW: 3D Flip (Y-Axis) */
+  @keyframes flipIn { from { opacity: 0; transform: perspective(600px) rotateY(90deg); } to { opacity: 1; transform: perspective(600px) rotateY(0); } }
+  /* NEW: 360 Spin */
+  @keyframes spin360 { from { opacity: 0; transform: rotate(180deg) scale(0.8); } to { opacity: 1; transform: rotate(0) scale(1); } }
+
+  .animate-slide-up { animation: slideUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-slide-left { animation: slideLeft 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-slide-right { animation: slideRight 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-zoom { animation: zoomIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-rotate { animation: rotateIn 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-flip { animation: flipIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+  .animate-spin360 { animation: spin360 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+  /* --- INTERNAL TEXT FLOW (For Banner & Tiers) --- */
+  @keyframes flowIn {
+    from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+  @keyframes textBreathe { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
+
+  /* By default, hide internal elements */
+  .banner h1, .banner p, .banner .row,
+  .tiers h2, .tiers p { opacity: 0; }
+
+  /* When .flow-active is added, trigger the internal flow */
+  .flow-active h1, .flow-active p, .flow-active .row {
+    animation: flowIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, textBreathe 5s infinite ease-in-out 1s;
+  }
+  .flow-active h1 { animation-delay: 0.1s, 1s; }
+  .flow-active p:nth-of-type(1) { animation-delay: 0.3s, 1s; }
+  .flow-active .row { animation-delay: 0.5s, 1s; }
+  .flow-active p:nth-of-type(2) { animation-delay: 0.7s, 1s; }
+  .flow-active h2 { animation-delay: 0.2s, 1.5s; }
+  .flow-active p:nth-of-type(3) { animation-delay: 0.4s, 1.5s; }
+  .flow-active p:nth-of-type(4) { animation-delay: 0.5s, 1.5s; }
+  .flow-active p:nth-of-type(5) { animation-delay: 0.6s, 1.5s; }
+  .flow-active p:nth-of-type(6) { animation-delay: 0.7s, 1.5s; }
+  .flow-active p:nth-of-type(7) { animation-delay: 0.8s, 1.5s; }
+
+</style>
+
+</head>
+<body>
+<header>
+  <div class="brand"><b>iBiz Gadget Shop</b><span>Everyday home gadgets · Toronto · Mississauga · Brampton</span></div>
+  
+  <button id="signInBtn" type="button" style="background:white; color:var(--ink); margin-right:8px; border:1px solid var(--border); font-weight:bold;">Sign in</button>
+  <button id="cartBtn" type="button" class="primary">Cart (<span id="cartCount">0</span>)</button>
+</header>
+<main>
+  <section class="banner">
+    <h1>Order today — pay by e-transfer.<br>Our representative will call you back to confirm.</h1>
+    <p>No card payments, no surprises. Place your order, we call you to confirm, and you send an Interac e-transfer. Prices in CAD. A local shop for the GTA — Toronto, Mississauga &amp; Brampton — with a real person you can call or text.</p>
+    <div class="row">
+      <button class="demo" id="demoBtn" type="button">Book a Demo</button>
+      <a class="call" href="tel:+16477170929">Call 647-717-0929</a>
+      <a class="text" href="sms:+16477170929">Text 647-717-0929</a>
+    </div>
+    <p class="contactline">Questions or ordering help? Best to call. Have a complaint? Best to text us — we'll call you back, find the cause, and make it right. Email works too: <a href="mailto:amit.mits.puri@gmail.com">amit.mits.puri@gmail.com</a></p>
+  </section>
+
+  <section class="tiers">
+    <h2>Three price tiers — here's the honest difference</h2>
+    <p><b>Best value:</b> The lowest-priced way to get the job done in its category — simpler models that cover the basics well.</p>
+    <p><b>Mid-range:</b> A step up in its category: typically more features for the money — extra heads or accessories, a display, bigger capacity, or a stronger motor, as listed for each product.</p>
+    <p><b>Premium:</b> The top of its category: the most powerful or best-equipped option we carry — largest capacity, strongest performance, most extras included, as listed for each product.</p>
+    <p>Tiers are set by price inside each category, and every product page lists its exact features — so you can see what the extra money actually buys before you order.</p>
+  </section>
+
+  <div class="controls">
+    <input type="search" id="search" placeholder="Search gadgets — try “scrubber”, “shaver”, “snow”…" aria-label="Search products">
+    <select id="sort" aria-label="Sort products">
+      <option value="featured">Featured order</option>
+      <option value="asc">Price: low to high</option>
+      <option value="desc">Price: high to low</option>
+      <option value="name">Name A–Z</option>
+    </select>
+  </div>
+  <div class="chips" id="chips" role="group" aria-label="Filter by category"></div>
+  <div class="tierfilter" id="tierfilter" role="group" aria-label="Filter by price tier">
+    <span>Price tier:</span>
+    <button type="button" data-tier="All" aria-pressed="true">All tiers</button>
+    <button type="button" data-tier="Best value" aria-pressed="false">Best value</button>
+    <button type="button" data-tier="Mid-range" aria-pressed="false">Mid-range</button>
+    <button type="button" data-tier="Premium" aria-pressed="false">Premium</button>
+  </div>
+  <p id="count" style="color:var(--dim);font-size:14px"></p>
+  <section class="grid" id="grid"></section>
+
+  <section class="how">
+    <h2>How our shop works</h2>
+    <p>We're a small local shop serving Toronto, Mississauga &amp; Brampton — not a worldwide warehouse. Here's exactly how ordering with us works, in plain language.</p>
+    <p><b>Ordering &amp; confirmation:</b> Place your order on this page — you don't pay anything yet. Our representative calls you back at the number you give to confirm the items, the delivery timing, and the total before any money moves.</p>
+    <p><b>Payment — e-transfer only:</b> We take Interac e-transfer only — no card payments, nothing charged automatically. After the confirmation call, you send the total by e-transfer and we get your order moving.</p>
+    <p><b>Delivery &amp; local pickup:</b> Each product page shows its delivery estimate, and we confirm the timing on your call. Prefer to pick up? We're at 3888 Boulevard, Mississauga, ON L5B 4P5, Canada — call ahead at 647-717-0929 and we'll have it ready.</p>
+    <p><b>Price tiers, honestly:</b> Every category has Best value, Mid-range, and Premium picks, set by price within that category. Higher tiers cost more because those products include more — more power, capacity, heads or accessories, as each product page lists. Compare the details on the page, or call us and we'll help you choose.</p>
+    <p><b>If something goes wrong:</b> Text us at 647-717-0929 with what happened — texting is best for complaints, because we'll call you back, find the cause, and fix it. Questions about a product or an order are fastest by call. Email at amit.mits.puri@gmail.com works too.</p>
+  </section>
+
+  <section class="talk">
+    <h2>Talk to us — we're local in the GTA</h2>
+    <p>One number for everything: <b>647-717-0929</b>. Text messages are appreciated, email is fine too, and calls are always welcome.</p>
+    <p><b>Asking about a product or an order?</b> Best to call — it's the fastest way to get an answer and place or change an order. <a href="tel:+16477170929">Call 647-717-0929</a></p>
+    <p><b>Something wrong? Tell us by text.</b> For complaints, texting is better — send the details and we'll call you back, find the cause, and fix it. That's how we keep getting better for our customers. <a href="sms:+16477170929?&amp;body=Hi%2C%20I%20need%20help%20with%3A%20">Text 647-717-0929</a></p>
+    <p><b>Prefer email?</b> Email is okay too — for orders, questions, or complaints with photos. <a href="mailto:amit.mits.puri@gmail.com">amit.mits.puri@gmail.com</a></p>
+    <p><b>Visit / pickup:</b> <a href="https://www.google.com/maps/search/?api=1&amp;query=3888+Boulevard%2C+Mississauga%2C+ON+L5B+4P5%2C+Canada">3888 Boulevard, Mississauga, ON L5B 4P5, Canada</a> — tap the address for directions. Call ahead to confirm pickup.</p>
+  </section>
+
+  </main>
+<footer>iBiz Gadget Shop — your local GTA convenience store, online<br>
+Visit / pickup: <a href="https://www.google.com/maps/search/?api=1&amp;query=3888+Boulevard%2C+Mississauga%2C+ON+L5B+4P5%2C+Canada">3888 Boulevard, Mississauga, ON L5B 4P5, Canada</a> — tap the address for directions. Call ahead to confirm pickup.<br>
+Phone: <a href="tel:+16477170929">647-717-0929</a> · Text: <a href="sms:+16477170929">647-717-0929</a> · Email: <a href="mailto:amit.mits.puri@gmail.com">amit.mits.puri@gmail.com</a><br>
+Pay by Interac e-transfer only — no card payments. Our representative will call you back to confirm every order.</footer>
+
+<dialog id="detailDlg"><div class="detail" id="detailBody"></div></dialog>
+
+<dialog id="cartDlg">
+  <h2>Your cart</h2>
+  <div id="cartBody"></div>
+</dialog>
+
+<dialog id="demoDlg">
+  <h2>Book a Demo</h2>
+  <p style="color:var(--dim);font-size:14px">Want to see a gadget working before you buy? Fill this in — your email app opens with the request ready to send, and our representative will call you back.</p>
+  <form id="demoForm">
+    <label>Your name <input required id="demoName"></label>
+    <label>Phone — we call this number back <input required type="tel" id="demoPhone"></label>
+    <label>Product <select id="demoProduct"></select></label>
+    <label>Good time to call (optional) <input id="demoWhen" placeholder="e.g. Weekday evenings"></label>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button type="submit" class="primary">Send demo request by email</button>
+      <button type="button" id="demoClose">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* ================= CONFIG — adjust these and refresh, no build step ================= */
+const CONFIG = {
+  shopEmail: "amit.mits.puri@gmail.com",
+  shopPhone: "647-717-0929",
+  shopAddress: "3888 Boulevard, Mississauga, ON L5B 4P5, Canada",
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=3888+Boulevard%2C+Mississauga%2C+ON+L5B+4P5%2C+Canada"
+};
+/* =================================================================================== */
+
+const PRODUCTS = [{"id": 1, "name": "7-Pc Stainless Steel Vegetable Slicer & Grater Set", "category": "Kitchen", "desc": "Interchangeable-blade slicer/grater set for potatoes, carrots and veg prep. Manual, no power needed.", "price": 15.54, "img": "assets/products/p01.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 2, "name": "Stainless Steel Meatball Maker / Shaper", "category": "Kitchen", "desc": "Reusable meatball, fish-ball and shrimp-ball mold. Easy demold, for home frying and batch cooking.", "price": 22.13, "img": "assets/products/p02.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 3, "name": "Manual Vegetable Slicer, Grater & Julienne Peeler", "category": "Kitchen", "desc": "Slice, grate and julienne potato, cucumber and carrot.", "price": 9.51, "img": "assets/products/p03.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 4, "name": "Electric Food Processor / Garlic Chopper - USB Rechargeable", "category": "Kitchen", "desc": "Wireless mini chopper for garlic, ginger, chili, fruit and meat. 250ml / 8.45oz, USB rechargeable.", "price": 13.44, "img": "assets/products/p04.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 5, "name": "Electric Food Chopper 15.25oz - Cordless Mini Processor", "category": "Kitchen", "desc": "Larger rechargeable chopper/blender for veg, garlic and meat grinding. Portable, cordless.", "price": 20.76, "img": "assets/products/p05.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 6, "name": "22-in-1 / 15-in-1 Food Chopper with Container", "category": "Kitchen", "desc": "Multi-blade chopper, slicer and dicer with 12 blades, strainer basket and storage container.", "price": 30.81, "img": "assets/products/p06.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 7, "name": "14-in-1 Vegetable Cutter with Container", "category": "Kitchen", "desc": "Manual slicer/dicer/shredder with container for onions, potatoes, tomatoes and carrots.", "price": 33.21, "img": "assets/products/p07.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 8, "name": "Automatic Soap Dispenser 400ml - Touchless Foaming, USB", "category": "Bathroom", "desc": "Touchless sensor foaming soap dispenser, 400ml, USB rechargeable. For bathroom and kitchen.", "price": 21.77, "img": "assets/products/p08.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 9, "name": "Automatic Soap Dispenser 380ml - Touchless Foaming, USB", "category": "Bathroom", "desc": "Touchless sensor foaming dispenser, 380ml / 13.5oz, USB rechargeable, wall or counter use.", "price": 25.97, "img": "assets/products/p09.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 10, "name": "Shampoo & Conditioner Dispenser - 3-Chamber, No-Drill", "category": "Bathroom", "desc": "Wall-mounted 3-chamber shower dispenser for shampoo, conditioner and body wash. No drilling.", "price": 24.21, "img": "assets/products/p10.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 11, "name": "3-in-1 Wall-Mounted Shampoo, Conditioner & Body Wash Dispenser", "category": "Bathroom", "desc": "No-drill 3-in-1 shower dispenser, large capacity, phthalate-free plastic.", "price": 30.24, "img": "assets/products/p11.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 12, "name": "High-Pressure Handheld Shower Head - 5 Modes", "category": "Bathroom", "desc": "Handheld high-pressure shower head, 5 spray modes, battery-free. Modern bathroom upgrade.", "price": 7.07, "img": "assets/products/p12.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 13, "name": "V-Shaped Toilet Brush - Wall-Hang, No Dead Corners", "category": "Bathroom", "desc": "Small V-shaped toilet brush that reaches the rim/elbow. Hangs on the wall.", "price": 2.46, "img": "assets/products/p13.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 14, "name": "Electric Spin Scrubber IPX5 - 6/9 Brush Heads", "category": "Cleaning", "desc": "Cordless rotating scrubber, replaceable 6 or 9 brush heads, adjustable extension handle, USB-C.", "price": 49.53, "img": "assets/products/p14.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 15, "name": "Electric Spin Scrubber - 7 Heads, Battery Display", "category": "Cleaning", "desc": "Cordless scrubber with battery level display, 7 replaceable heads, dual speed, telescopic handle.", "price": 34.61, "img": "assets/products/p15.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 16, "name": "Electric Scrubber - 5 Brush Heads, Portable", "category": "Cleaning", "desc": "Handheld portable spin scrubber for bathroom, tub, wall tiles, floor and kitchen.", "price": 15.87, "img": "assets/products/p16.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 17, "name": "Electric Rotary Scrubber - 9/6 Heads, USB-C", "category": "Cleaning", "desc": "Cordless rotary cleaning brush, 9/6 replaceable heads, adjustable extended handle, for tile/tub/sink/wall.", "price": 38.31, "img": "assets/products/p17.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 18, "name": "Sponge Eraser Tub & Tile Cleaner with Handle - 4pcs/2pcs", "category": "Cleaning", "desc": "Sponge eraser scrubber with handle for kitchen, pool, dishes and tile cleaning.", "price": 3.53, "img": "assets/products/p18.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 19, "name": "Disposable Toilet Seat Covers - Travel Pack", "category": "Cleaning", "desc": "Individually wrapped portable toilet seat covers for travel, hotels, airplanes and camping.", "price": 6.53, "img": "assets/products/p19.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 20, "name": "Men's Mini Portable Electric Shaver - USB Fast Charging", "category": "Shavers & Grooming", "desc": "Pocket mini shaver, one-touch start, USB fast charging, residue-free shave. Gift-ready for men.", "price": 8.3, "img": "assets/products/p20.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 21, "name": "Men's Mini Electric Shaver - LED Battery Display, USB", "category": "Shavers & Grooming", "desc": "Travel-size mini shaver with LED battery display, USB rechargeable, beard trimmer function.", "price": 31.86, "img": "assets/products/p21.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 22, "name": "Mini Electric Shaver - Pocket Wet & Dry, USB", "category": "Shavers & Grooming", "desc": "Pocket-size wet and dry men's razor, USB rechargeable. For home, car, travel and office.", "price": 9.83, "img": "assets/products/p22.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 23, "name": "Men's Foil Electric Shaver - LED Display, USB-C", "category": "Shavers & Grooming", "desc": "Foil shaver with display, USB Type-C fast charging, portable cordless beard trimmer.", "price": 35.27, "img": "assets/products/p23.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 24, "name": "Portable Electric Nose & Ear Hair Trimmer", "category": "Shavers & Grooming", "desc": "Cordless nose/ear, eyebrow and facial hair trimmer for men and women. Metal, battery powered.", "price": 4.28, "img": "assets/products/p24.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 25, "name": "Mini Portable Wireless Trimmer - T-Blade, Type-C", "category": "Shavers & Grooming", "desc": "T-blade trimmer with 4 length combs, display, Type-C charging and brush. Hairline and beard contouring.", "price": 21.62, "img": "assets/products/p25.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 26, "name": "Professional Cordless Hair Clipper & Beard Trimmer", "category": "Shavers & Grooming", "desc": "USB charging hair clipper / trimmer set for home haircuts.", "price": 4.86, "img": "assets/products/p26.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 27, "name": "6D Bald Head Shaver - IPX7 Waterproof, Type-C", "category": "Shavers & Grooming", "desc": "10W electric bald head clipper, IPX7 waterproof, Type-C, 1400mAh, 2-level adjustment, LED display.", "price": 42.11, "img": "assets/products/p27.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 28, "name": "Electric Back Shaver - Long Handle, Rechargeable", "category": "Shavers & Grooming", "desc": "Long-handle back hair trimmer, foldable/adjustable handle, self-use back and body grooming.", "price": 36.92, "img": "assets/products/p28.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 29, "name": "USB LED Neon Light Strip - Motion Sensor, Dimmable", "category": "Electronics & Home Tech", "desc": "5V USB LED neon strip, motion sensor, dimmable, flexible. Room, cabinet and hallway decoration.", "price": 20.06, "img": "assets/products/p29.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 30, "name": "1.5L Humidifier - Whisper-Quiet, Warm Night Light", "category": "Electronics & Home Tech", "desc": "Large-capacity USB tabletop humidifier, double spray, warm night light, water level display.", "price": 35.88, "img": "assets/products/p30.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 31, "name": "Single-Person Humidifier - USB Portable", "category": "Electronics & Home Tech", "desc": "Compact personal humidifier for bedroom, office and dorm. Ultrasonic cool mist.", "price": 31.34, "img": "assets/products/p31.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 32, "name": "Aromatherapy Diffuser & Humidifier 13.53oz", "category": "Electronics & Home Tech", "desc": "Essential oil diffuser/humidifier with lighting, timer and auto shut-off. Bedroom/office/living room.", "price": 38.73, "img": "assets/products/p32.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 33, "name": "Cordless Electric Snow Shovel 12-inch - 2x 4000mAh Batteries", "category": "Snow Removal", "desc": "Battery snow blower/shovel, 12-inch width, 16.5ft throw, directional plate, 2 batteries + charger.", "price": 247.4, "img": "assets/products/p33.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 34, "name": "ZEEKMUSS 21V Snow Shovel Set 13-inch Brushless", "category": "Snow Removal", "desc": "21V brushless electric snow remover, 13-inch, adjustable handle and safety switch, 1 or 2 battery options.", "price": 152.18, "img": "assets/products/p34.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 35, "name": "20V Wireless Snow Shovel & Blower - 2 Batteries", "category": "Snow Removal", "desc": "Cordless snow shovel/blower with 2 high-capacity batteries, two-stage folding, for driveways and walkways.", "price": 167.36, "img": "assets/products/p35.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 36, "name": "21V Cordless Electric Snow Shovel - Heavy Duty, Foldable", "category": "Snow Removal", "desc": "Heavy-duty lightweight foldable snow thrower for driveway, patio, sidewalk and roof.", "price": 218.21, "img": "assets/products/p36.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 37, "name": "40V Cordless Snow Blower 20-inch Brushless", "category": "Snow Removal", "desc": "40V 20-inch snow blower, brushless motor, batteries + dual charger, dual LED lights.", "price": 403.71, "img": "assets/products/p37.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 38, "name": "Multifunctional Spade Snow Shovel XL", "category": "Snow Removal", "desc": "XL multifunctional spade snow shovel for yard and outdoor use, 18.9 x 17.72 inch, white.", "price": 46.49, "img": "assets/products/p38.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 39, "name": "Portable Car Snow & Ice Remover - Ice Scraper", "category": "Snow Removal", "desc": "Compact heavy-duty car window snow shovel with ice scraper for cars, trucks and RVs.", "price": 2.63, "img": "assets/products/p39.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 40, "name": "Cordless Turbo Snow Blower Fan - USB Rechargeable", "category": "Snow Removal", "desc": "Handheld turbo jet blower fan for light snow, car, dust and leaves. Type-C rechargeable.", "price": 47.03, "img": "assets/products/p40.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 41, "name": "Robot Vacuum - Ultra-Thin, One-Button Start, with Mop Cloth", "category": "Cleaning", "desc": "SPECIAL: Automatic robot vacuum, spot mode, floor cleaning with mop cloth, rechargeable, random cleaning for whole house.", "price": 98.19, "img": "assets/products/p41.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 42, "name": "Electric Fabric Shaver FLZH - Type-C, LCD, 6-Blade", "category": "Cleaning", "desc": "Portable rechargeable lint remover, Type-C, LCD display, 6-blade, 1500RPM. Removes pilling from clothes and furniture.", "price": 35.63, "img": "assets/products/p42.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 43, "name": "Electric Fabric Shaver - USB Rechargeable, Budget", "category": "Cleaning", "desc": "USB rechargeable sweater shaver / lint remover for clothes, bedding, furniture, carpet and sofa.", "price": 14.13, "img": "assets/products/p43.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 44, "name": "Mini Projector - LED, Built-In Speakers, 1080P Support", "category": "Electronics & Home Tech", "desc": "New upgraded mini projector, LED galaxy/movie projector, built-in speakers, supports 1080P, USB, compact for bedroom/living room.", "price": 45.81, "img": "assets/products/p44.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 45, "name": "Electric Water Dispenser Pump - USB, for 2-5 Gallon Bottles", "category": "Kitchen", "desc": "Plug-and-play automatic water pump for 2-5 gallon bottles, USB rechargeable, continuous pouring. No heavy lifting, no manual pumping.", "price": 14.3, "img": "assets/products/p45.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 46, "name": "Portable Electric Water Pump - High-Suction, Automatic", "category": "Kitchen", "desc": "Automatic instant water dispenser with fast high-suction motor, foldable, cable charging. For home, camping and emergency.", "price": 21.27, "img": "assets/products/p46.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 47, "name": "SPECIAL: Air Mattress with Built-In Electric Pump - 10 inch", "category": "Home", "desc": "Inflatable mattress with built-in pump, self-inflation/deflation, electric pump with lights, carry bag and repair kit.", "price": 202.07, "img": "assets/products/p47.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 48, "name": "Electric Air Pump - Portable Inflator / Deflator", "category": "Home", "desc": "Outdoor camping electric air pump, inflates/deflates air mattresses, sofas, cushions and vacuum bags. Rechargeable.", "price": 20.24, "img": "assets/products/p48.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 49, "name": "Men's Electric Shaver - Multifunctional, Rechargeable Trimmer", "category": "Shavers & Grooming", "desc": "Multifunctional men's shaver with rechargeable hairline trimmer, for home haircuts and salon-style grooming.", "price": 29.91, "img": "assets/products/p49.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 50, "name": "3-Head Electric Shaver - USB Charging", "category": "Shavers & Grooming", "desc": "Electric shaver with 3 shaving heads, USB charging, sleek grooming tool. A great Father's Day gift pick.", "price": 18.56, "img": "assets/products/p50.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 51, "name": "Cordless Electric Spin Mop - Floor Scrubber & Polisher", "category": "Cleaning", "desc": "Electric mop / spinning floor scrubber and polisher with replacement pad. Automatic version of hand mopping.", "price": 55.68, "img": "assets/products/p51.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 52, "name": "Cordless Vacuum & Mop Combo with Water Tank", "category": "Cleaning", "desc": "Vacuum and mop in one, water tank, rotating brush for pet hair and food spills on tile/wood/carpet.", "price": 137.96, "img": "assets/products/p52.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 53, "name": "Robot Mop 3-in-1 - Mopping, Dusting & Spray", "category": "Cleaning", "desc": "Robot mop with steam/spray function, wet/dry mopping, up to 75 minutes. For apartments, dorms and homes.", "price": 33.02, "img": "assets/products/p53.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 54, "name": "Portable Handheld Vacuum - Home & Car, USB Rechargeable", "category": "Cleaning", "desc": "Powerful suction mini vacuum with multiple accessories for cars, homes, offices and crevices.", "price": 53.78, "img": "assets/products/p54.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 55, "name": "Mini Cordless Vacuum - Suction & Blowing, Dual Use", "category": "Cleaning", "desc": "Compact mini vacuum for home, commercial and car interiors, suction + blowing, for pet hair and dust.", "price": 16.92, "img": "assets/products/p55.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 56, "name": "Cordless Stick Vacuum - Lightweight, Handheld Convertible", "category": "Cleaning", "desc": "Lightweight stick vacuum, rechargeable handheld mode for hardwood, carpet, pet hair, sofa, stairs and car.", "price": 71.85, "img": "assets/products/p56.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 57, "name": "Cordless Vacuum 8-in-1 - LED Display, 3 Suction Modes", "category": "Cleaning", "desc": "8-in-1 cordless vacuum, LED display, 3 suction levels, detachable battery, for hard floor, carpet and pet hair.", "price": 143.31, "img": "assets/products/p57.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 58, "name": "Car Vacuum 6000PA - Handheld, 2000mAh, 5 Accessories", "category": "Cleaning", "desc": "6000PA handheld car vacuum, super suction, dual filtration, 2000mAh, 5 accessories for car interior and home.", "price": 20.91, "img": "assets/products/p58.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 59, "name": "Electric Spin Scrubber 6-in-1 - LCD Power Display", "category": "Cleaning", "desc": "Cordless 6-in-1 spin scrubber, 6 interchangeable heads, LCD power display, for bathroom, sink, kitchen, tiles and grout.", "price": 34.25, "img": "assets/products/p59.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}, {"id": 60, "name": "Turbo Blower & Handheld Vacuum - 130,000 RPM", "category": "Electronics & Home Tech", "desc": "Cordless turbo blower / air duster and vacuum, 130,000RPM, Type-C, 5/8 nozzles. For car snow, PC dust, grill and outdoor cleaning.", "price": 89.15, "img": "assets/products/p60.jpeg", "delivery": "Standard (free): 6-18 days | Express: 4-9 days"}];
+const money = c => "$" + c.toFixed(2);
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+
+/* ---------- Tiers: lowest third Best value, middle third Mid-range, highest third Premium, by sell price inside each category ---------- */
+function groupOf(p){ return PRODUCTS.filter(x => x.category === p.category).slice().sort((a,b) => a.price - b.price); }
+function tierOf(p){
+  const g = groupOf(p), n = g.length, idx = g.findIndex(x => x.id === p.id), third = Math.round(n / 3);
+  if (idx < third) return "Best value";
+  if (idx >= n - third) return "Premium";
+  return "Mid-range";
+}
+function clauseOf(d){
+  let s = d.replace(/^SPECIAL:\s*/, "");
+  const i = s.search(/[,.]/);
+  if (i > 0) s = s.slice(0, i);
+  return s.charAt(0).toLowerCase() + s.slice(1);
+}
+/* ---------- Best-pick line: only real price gaps + the product's own listed features ---------- */
+function pitchOf(p){
+  const g = groupOf(p), top = g[g.length - 1], cheapest = g[0], tier = tierOf(p), clause = clauseOf(p.desc);
+  if (p.id === cheapest.id) return `Lowest price in ${p.category} — the budget pick that covers the basics. The tiers above it add more features and power; this one just gets it done for less.`;
+  if (tier === "Best value") return `Easy on the wallet in ${p.category} — covers the basics for less, while the mid-range and premium picks above it add more features and power.`;
+  if (tier === "Mid-range") return `The sweet spot in ${p.category} — $${(top.price - p.price).toFixed(2)} less than the top pick, and still brings ${clause}.`;
+  if (p.id === top.id) return `Top of the range in ${p.category} — our most fully equipped pick, with ${clause}. The lower tiers cost less, and include less.`;
+  return `Near the top in ${p.category} — ${clause}. A clear step up over the mid-range picks, just under the top price.`;
+}
+function relatedOf(p){
+  return PRODUCTS.filter(x => x.category === p.category && x.id !== p.id)
+    .sort((a,b) => Math.abs(a.price - p.price) - Math.abs(b.price - p.price)).slice(0, 10);
+}
+function tierCompare(cat){
+  const g = PRODUCTS.filter(x => x.category === cat).slice().sort((a,b) => a.price - b.price);
+  const picks = [g[0], g[Math.floor(g.length / 2)], g[g.length - 1]];
+  const labels = ["Cheapest in " + cat, "Middle of the range", "Top pick in " + cat];
+  const byId = new Map();
+  picks.forEach((p, i) => byId.set(p.id, { p, label: labels[i] })); /* later label wins, so a 2-product category shows Cheapest + Top pick, never a mislabelled Middle */
+  return [...byId.values()];
+}
+const tierClass = t => t === "Premium" ? "premium" : (t === "Mid-range" ? "mid" : "");
+
+let cart = JSON.parse(localStorage.getItem("ibiz-cart") || "{}");
+let orders = JSON.parse(localStorage.getItem("ibiz-orders") || "[]");
+let cat = "All", tier = "All", query = "", sort = "featured";
+
+const grid = document.getElementById("grid");
+const chips = document.getElementById("chips");
+const cats = ["All", ...new Set(PRODUCTS.map(p => p.category))];
+chips.innerHTML = cats.map(c => `<button type="button" data-cat="${esc(c)}" aria-pressed="${c === "All"}">${esc(c)}${c === "All" ? "" : " · " + PRODUCTS.filter(p => p.category === c).length}</button>`).join("");
+chips.addEventListener("click", e => {
+  const b = e.target.closest("button[data-cat]"); if (!b) return;
+  cat = b.dataset.cat;
+  chips.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.cat === cat)));
+  render();
+});
+document.getElementById("tierfilter").addEventListener("click", e => {
+  const b = e.target.closest("button[data-tier]"); if (!b) return;
+  tier = b.dataset.tier;
+  document.querySelectorAll("#tierfilter button").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.tier === tier)));
+  render();
+});
+document.getElementById("search").addEventListener("input", e => { query = e.target.value.toLowerCase(); render(); });
+document.getElementById("sort").addEventListener("change", e => { sort = e.target.value; render(); });
+
+function render() {
+  let list = PRODUCTS.filter(p => (cat === "All" || p.category === cat) && (tier === "All" || tierOf(p) === tier) && (!query || (p.name + " " + p.desc + " " + p.category).toLowerCase().includes(query)));
+  if (sort === "asc") list = [...list].sort((a, b) => a.price - b.price);
+  if (sort === "desc") list = [...list].sort((a, b) => b.price - a.price);
+  if (sort === "name") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+  document.getElementById("count").textContent = `Showing ${list.length} of ${PRODUCTS.length} products`;
+  grid.innerHTML = list.map(p => {
+    const t = tierOf(p);
+    return `
+    <article class="card">
+      <img src="${p.img}" alt="${esc(p.name)}" loading="lazy" data-detail="${p.id}">
+      <div class="body">
+        <div><span class="tierbadge ${tierClass(t)}">${t}</span> <span style="font-size:12px;color:var(--dim)">${esc(p.category)}</span></div>
+        <h3>${esc(p.name)}</h3><p>${esc(p.desc)}</p><p class="pitch">${esc(pitchOf(p))}</p><p>Delivery: ${esc(p.delivery)}</p>
+        <div class="foot"><span class="price">${money(p.price)}</span>
+        ${cart[p.id] ? `<span class="qty"><button type="button" data-dec="${p.id}" aria-label="Remove one">−</button><b>${cart[p.id]}</b><button type="button" data-inc="${p.id}" aria-label="Add one more">+</button></span>`
+                     : `<button type="button" class="primary" data-inc="${p.id}">Add to cart</button>`}
+        </div>
+        <button type="button" class="detailsbtn" data-detail="${p.id}">View details — 3 views, price &amp; delivery</button>
+      </div>
+    </article>`;
+  }).join("");
+  document.getElementById("cartCount").textContent = Object.values(cart).reduce((s, q) => s + q, 0);
+}
+grid.addEventListener("click", e => {
+  const d = e.target.closest("[data-detail]");
+  if (d) { openDetail(Number(d.dataset.detail)); return; }
+  const inc = e.target.closest("[data-inc]"), dec = e.target.closest("[data-dec]");
+  if (inc) { const id = inc.dataset.inc; cart[id] = (cart[id] || 0) + 1; }
+  if (dec) { const id = dec.dataset.dec; cart[id] = (cart[id] || 0) - 1; if (cart[id] <= 0) delete cart[id]; }
+  if (inc || dec) { localStorage.setItem("ibiz-cart", JSON.stringify(cart)); render(); }
+});
+
+/* ---------- Product detail view (in-page, no separate pages) ---------- */
+const detailDlg = document.getElementById("detailDlg");
+const detailBody = document.getElementById("detailBody");
+let detailView = "full";
+function openDetail(id){
+  const p = PRODUCTS.find(x => x.id === id); if (!p) return;
+  
+    let videoBtnHtml = p.video ? `<a href="${p.video}" target="_blank" class="primary" style="text-decoration:none; display:inline-block; text-align:center; padding:10px 14px; background:var(--amber); color:white; border-radius:999px; font-weight:bold; font-size:14px;">▶ Watch Video</a>` : '';
+
+  const t = tierOf(p), rel = relatedOf(p), cmp = tierCompare(p.category);
+  detailView = "full";
+  detailBody.innerHTML = `
+    <h2>${esc(p.name)}</h2>
+    <p><span class="tierbadge ${tierClass(t)}">${t}</span> <span style="color:var(--dim);font-size:13px">${esc(p.category)} · Catalogue #${p.id}</span></p>
+    <div class="gallery">
+      <img id="galleryImg" class="main" src="${p.img}" alt="${esc(p.name)}">
+      <div class="views" role="group" aria-label="Photo views">
+        <button type="button" data-view="full" aria-pressed="true">View 1 — Full photo</button>
+        <button type="button" data-view="close" aria-pressed="false">View 2 — Close-up</button>
+        <button type="button" data-view="detail" aria-pressed="false">View 3 — Detail crop</button>
+      </div>
+      <p class="note">3 views of the one photo we have for this product — three crops of the same photo, not three different photos. Want more angles? Call or text us and we'll send them.</p>
+    </div>
+    <p class="bigprice">${money(p.price)}</p>
+    <p class="pitch" style="font-style:italic">${esc(pitchOf(p))}</p>
+    <h3>Price &amp; delivery</h3>
+    <p>Price: <b>${money(p.price)}</b> CAD. Delivery: ${esc(p.delivery)}. Pay by Interac e-transfer after our confirmation call — no card payments.</p>
+    <h3>Specifications &amp; details</h3>
+    <p class="spec"><b>What it is:</b> ${esc(p.desc)}</p>
+    <p class="spec"><b>Category:</b> ${esc(p.category)}</p>
+    <p class="spec"><b>Delivery:</b> ${esc(p.delivery)}</p>
+    <p class="spec"><b>Catalogue #:</b> ${p.id} of 60</p>
+    <h3>Compare the tiers in ${esc(p.category)}</h3>
+    <div class="compare">${cmp.map(c => `<button type="button" data-detail="${c.p.id}"><span>${esc(c.label)} — ${esc(c.p.name)}</span><b>${money(c.p.price)}</b></button>`).join("")}</div>
+    <h3>Our shop policies</h3>
+    <p><b>Delivery &amp; local pickup:</b> We confirm timing on your call. Prefer to pick up? We're at 3888 Boulevard, Mississauga, ON L5B 4P5, Canada — call ahead at 647-717-0929 and we'll have it ready.</p>
+    <p><b>Payment — e-transfer only:</b> No card payments, nothing charged automatically. After the confirmation call, you send the total by e-transfer.</p>
+    <p><b>If something goes wrong:</b> Text us at 647-717-0929 — texting is best for complaints, because we'll call you back, find the cause, and fix it. Questions are fastest by call. Email at amit.mits.puri@gmail.com works too.</p>
+    <h3>Related products in ${esc(p.category)}</h3>
+    <div class="relgrid">${rel.map(r => `<button type="button" data-detail="${r.id}"><img src="${r.img}" alt=""><span>${esc(r.name)}</span><b>${money(r.price)}</b></button>`).join("")}</div>
+    <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+      ${videoBtnHtml}
+      <button type="button" class="primary" data-add="${p.id}">Add to cart — ${money(p.price)}</button>
+      <button type="button" id="detailDemo">Book a Demo</button>
+      <button type="button" id="detailClose">Close</button>
+    </div>`;
+  detailDlg.showModal();
+  detailBody.querySelector(".gallery .views").addEventListener("click", e => {
+    const b = e.target.closest("button[data-view]"); if (!b) return;
+    detailView = b.dataset.view;
+    const img = document.getElementById("galleryImg");
+    img.className = "main" + (detailView === "close" ? " view-close" : detailView === "detail" ? " view-detail" : "");
+    detailBody.querySelectorAll(".gallery .views button").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.view === detailView)));
+  });
+  detailBody.querySelector("#detailClose").addEventListener("click", () => detailDlg.close());
+  detailBody.querySelector("#detailDemo").addEventListener("click", () => { detailDlg.close(); document.getElementById("demoDlg").showModal(); });
+  detailBody.querySelector("[data-add]").addEventListener("click", e => {
+    const id = e.target.dataset.add; cart[id] = (cart[id] || 0) + 1;
+    localStorage.setItem("ibiz-cart", JSON.stringify(cart)); render(); detailDlg.close();
+    document.getElementById("cartDlg").showModal(); renderCart();
+  });
+}
+detailBody.addEventListener("click", e => {
+  const d = e.target.closest("[data-detail]"); if (d) openDetail(Number(d.dataset.detail));
+});
+
+/* ---------- Cart + checkout (e-transfer only) ---------- */
+const cartDlg = document.getElementById("cartDlg");
+document.getElementById("cartBtn").addEventListener("click", () => { renderCart(); cartDlg.showModal(); });
+document.getElementById("ordersBtn").addEventListener("click", () => document.getElementById("ordersSection").scrollIntoView({ behavior: "smooth" }));
+
+function cartLines() { return PRODUCTS.filter(p => cart[p.id]).map(p => ({ p, qty: cart[p.id], price: p.price })); }
+
+function renderCart(placedOrder) {
+  const body = document.getElementById("cartBody");
+  if (placedOrder) {
+    const o = placedOrder;
+    const items = o.items.map(i => `- ${i.name} x ${i.qty} — ${money(i.price * i.qty)}`).join("\n");
+    const mail = `mailto:${CONFIG.shopEmail}?subject=${encodeURIComponent("Order #" + o.id + " — " + o.name)}&body=${encodeURIComponent("Order #" + o.id + " from the iBiz Gadget Shop\n\n" + items + `\nTotal: ${money(o.total)} CAD — paying by Interac e-transfer\n\nName: ${o.name}\nPhone (please call me back): ${o.phone}\nEmail: ${o.email}` + (o.address ? `\nAddress: ${o.address}` : "") + (o.notes ? `\nNotes / concerns: ${o.notes}` : ""))}`;
+    body.innerHTML = `
+      <div class="ok"><b>Order #${o.id} placed — thank you!</b><br>Our representative will call you back at ${o.phone} to confirm.</div>
+      <div class="etransfer"><b>Pay by Interac e-transfer</b><br>Send <b>${money(o.total)}</b> to <b>${CONFIG.shopEmail}</b> and put <b>“Order #${o.id}”</b> in the message field.</div>
+      <p style="font-size:14px;color:var(--dim)">Your order is saved under “Orders on this device” below and included in orders.csv. Prefer email? <a href="${mail}">Email this order to us</a>.</p>
+      <button type="button" class="primary" onclick="document.getElementById('cartDlg').close()">Keep shopping</button>`;
+    return;
+  }
+  const lines = cartLines();
+  if (!lines.length) { body.innerHTML = `<p style="color:var(--dim)">Your cart is empty.</p><button type="button" onclick="document.getElementById('cartDlg').close()">Close</button>`; return; }
+  const total = lines.reduce((s, l) => s + l.price * l.qty, 0);
+  body.innerHTML = `
+    ${lines.map(l => `<p style="display:flex;justify-content:space-between;gap:8px"><span>${esc(l.p.name)} × ${l.qty}</span><b>${money(l.price * l.qty)}</b></p>`).join("")}
+    <p style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:8px"><b>Total (CAD)</b><b>${money(total)}</b></p>
+    <p style="color:var(--amber);font-weight:600;font-size:14px">Pay by e-transfer after you order — our representative will call you back to confirm.</p>
+    <form id="checkoutForm">
+      <label>Your name <input required id="coName"></label>
+      <label>Phone — we call this number back <input required type="tel" id="coPhone"></label>
+      <label>Email for your confirmation <input required type="email" id="coEmail"></label>
+      <label>Delivery address (optional) <input id="coAddress"></label>
+      <label>Anything we should know? (optional — questions or concerns) <input id="coNotes" placeholder="e.g. Please call after 5pm"></label>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button type="submit" class="primary">Place order — ${money(total)} by e-transfer</button>
+        <button type="button" onclick="document.getElementById('cartDlg').close()">Cancel</button>
+      </div>
+    </form>`;
+  document.getElementById("checkoutForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const o = {
+      id: (orders.reduce((m, x) => Math.max(m, x.id), 0) + 1),
+      date: new Date().toISOString().slice(0, 10),
+      name: document.getElementById("coName").value.trim(),
+      phone: document.getElementById("coPhone").value.trim(),
+      email: document.getElementById("coEmail").value.trim(),
+      address: document.getElementById("coAddress").value.trim(),
+      notes: document.getElementById("coNotes").value.trim(),
+      items: lines.map(l => ({ name: l.p.name, qty: l.qty, price: l.price, img: l.p.img })),
+      total: Math.round(total * 100) / 100,
+      etransfer: "Not sent",
+      callback: "Awaiting callback",
+    };
+    orders.push(o);
+    
+    // Send to Python Backend
+    fetch('/api/order', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(o)
+    }).catch(err => console.log("Backend error:", err));
+    localStorage.setItem("ibiz-orders", JSON.stringify(orders));
+    cart = {}; localStorage.setItem("ibiz-cart", "{}");
+    
+// Fetch products dynamically from CSV on load
+async function loadProducts() {
+    try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        PRODUCTS = data; // Replace empty array with CSV data
+        
+        // Re-initialize categories based on new data
+        const cats = ["All", ...new Set(PRODUCTS.map(p => p.category))];
+        const chips = document.getElementById("chips");
+        if(chips) {
+            chips.innerHTML = cats.map(c => `<button type="button" data-cat="${esc(c)}" aria-pressed="${c === "All"}">${esc(c)}${c === "All" ? "" : " · " + PRODUCTS.filter(p => p.category === c).length}</button>`).join("");
+        }
+        
+        // Now render the grid
+        render();
+    } catch (e) {
+        console.error("Failed to load products:", e);
+    }
+}
+// Call it immediately
+loadProducts();
+
+renderOrders(); renderCart(o);
+  });
+}
+
+/* ---------- Orders on this device + orders.csv ---------- */
+const ET = ["Not sent", "Sent - awaiting confirmation", "Received", "Cancelled"];
+const CB = ["Awaiting callback", "Called back", "Cancelled"];
+function renderOrders() {
+  const tb = document.querySelector("#ordersTable tbody");
+  document.getElementById("noOrders").style.display = orders.length ? "none" : "";
+  tb.innerHTML = orders.map((o, idx) => `<tr>
+    <td>${o.date}</td><td>#${o.id}</td><td>${esc(o.name)}</td><td>${esc(o.phone)}</td><td>${esc(o.email)}</td>
+    <td>${o.items.map(i => `${esc(i.name)} × ${i.qty}`).join("<br>")}</td><td><b>${money(o.total)}</b></td>
+    <td><select data-idx="${idx}" data-field="etransfer" aria-label="E-transfer status for order ${o.id}">${ET.map(s => `<option ${s === o.etransfer ? "selected" : ""}>${s}</option>`).join("")}</select></td>
+    <td><select data-idx="${idx}" data-field="callback" aria-label="Callback status for order ${o.id}">${CB.map(s => `<option ${s === o.callback ? "selected" : ""}>${s}</option>`).join("")}</select></td>
+    <td>${esc(o.notes || "—")}</td>
+  </tr>`).join("");
+}
+document.querySelector("#ordersTable").addEventListener("change", e => {
+  const s = e.target.closest("select[data-idx]"); if (!s) return;
+  orders[Number(s.dataset.idx)][s.dataset.field] = s.value;
+  localStorage.setItem("ibiz-orders", JSON.stringify(orders));
+});
+function csvCell(v) { v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+document.getElementById("csvBtn").addEventListener("click", () => {
+  const rows = [["Date", "Order #", "Name", "Phone", "Email", "Product", "Quantity", "Sell Price (CAD)", "Line Total (CAD)", "Order Total (CAD)", "E-Transfer Status", "Callback Status", "Customer Notes / Concerns"]];
+  for (const o of orders) for (const i of o.items)
+    rows.push([o.date, o.id, o.name, o.phone, o.email, i.name, i.qty, i.price.toFixed(2), (i.price * i.qty).toFixed(2), o.total.toFixed(2), o.etransfer, o.callback, o.notes || ""]);
+  const blob = new Blob([rows.map(r => r.map(csvCell).join(",")).join("\n")], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "orders.csv"; a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+/* ---------- Book a Demo (email link, no backend) ---------- */
+const demoDlg = document.getElementById("demoDlg");
+document.getElementById("demoProduct").innerHTML = `<option value="">Not sure yet — show me the popular ones</option>` + PRODUCTS.map(p => `<option>${esc(p.name)} — ${money(p.price)}</option>`).join("");
+document.getElementById("demoBtn").addEventListener("click", () => demoDlg.showModal());
+document.getElementById("demoClose").addEventListener("click", () => demoDlg.close());
+document.getElementById("demoForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const name = document.getElementById("demoName").value.trim();
+  const phone = document.getElementById("demoPhone").value.trim();
+  const prod = document.getElementById("demoProduct").value || "Not sure yet";
+  const when = document.getElementById("demoWhen").value.trim();
+  const body = `Hi, I'd like to book a demo.\n\nName: ${name}\nPhone (please call me back): ${phone}\nProduct: ${prod}` + (when ? `\nGood time to call: ${when}` : "");
+  window.location.href = `mailto:${CONFIG.shopEmail}?subject=${encodeURIComponent("Demo request — " + name)}&body=${encodeURIComponent(body)}`;
+  demoDlg.close();
+});
+
+
+// Fetch products dynamically from CSV on load
+async function loadProducts() {
+    try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        PRODUCTS = data; // Replace empty array with CSV data
+        
+        // Re-initialize categories based on new data
+        const cats = ["All", ...new Set(PRODUCTS.map(p => p.category))];
+        const chips = document.getElementById("chips");
+        if(chips) {
+            chips.innerHTML = cats.map(c => `<button type="button" data-cat="${esc(c)}" aria-pressed="${c === "All"}">${esc(c)}${c === "All" ? "" : " · " + PRODUCTS.filter(p => p.category === c).length}</button>`).join("");
+        }
+        
+        // Now render the grid
+        render();
+    } catch (e) {
+        console.error("Failed to load products:", e);
+    }
+}
+// Call it immediately
+loadProducts();
+
+renderOrders();
+</script>
+
+
+
+
+
+
+
+<script>
+window.renderOrders = async function() {
+    try {
+        const res = await fetch('/api/orders');
+        const serverOrders = await res.json();
+        const tb = document.querySelector("#ordersTable tbody");
+        const noOrdersText = document.getElementById("noOrders");
+        
+        if(serverOrders.length === 0) {
+            if(noOrdersText) noOrdersText.style.display = "block";
+            tb.innerHTML = "";
+            return;
+        }
+        
+        if(noOrdersText) noOrdersText.style.display = "none";
+        
+        let html = "";
+        serverOrders.forEach((o, idx) => {
+            o.items.forEach((item, i) => {
+                html += `<tr>
+                    ${i === 0 ? `<td rowspan="${o.items.length}">${idx + 1}</td>` : ''}
+                    ${i === 0 ? `<td rowspan="${o.items.length}">${o.date}<br><span style="font-size:12px;color:var(--dim)">Order #${o.id}</span></td>` : ''}
+                    ${i === 0 ? `<td rowspan="${o.items.length}">
+                        <b>${o.name}</b><br>
+                        <a href="tel:${o.phone}" style="color:var(--green);">${o.phone}</a><br>
+                        <a href="mailto:${o.email}" style="color:var(--green);">${o.email}</a><br>
+                        <span style="font-size:12px;color:var(--dim)">${o.address || ''}</span>
+                    </td>` : ''}
+                    <td>${item.name}</td>
+                    <td>${item.qty}</td>
+                    <td><b>$${Number(item.price * item.qty).toFixed(2)}</b></td>
+                    ${i === 0 ? `<td rowspan="${o.items.length}">${o.etransfer}</td>` : ''}
+                    ${i === 0 ? `<td rowspan="${o.items.length}">${o.callback}</td>` : ''}
+                    ${i === 0 ? `<td rowspan="${o.items.length}">${o.notes || '—'}</td>` : ''}
+                    ${i === 0 ? `<td rowspan="${o.items.length}">
+                        <select onchange="updateStatus('${o.id}', 'callback', this.value)" style="font-size:12px; padding:6px; border-radius:8px; background:#faf7f0; border:1px solid #e3dcc9;">
+                            <option value="Awaiting callback" ${o.callback === 'Awaiting callback' ? 'selected' : ''}>Awaiting callback</option>
+                            <option value="Called back" ${o.callback === 'Called back' ? 'selected' : ''}>Called back</option>
+                            <option value="Cancelled" ${o.callback === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>` : ''}
+                </tr>`;
+            });
+        });
+        tb.innerHTML = html;
+    } catch(e) { console.log("Error loading admin data", e); }
+};
+
+window.updateStatus = async function(orderId, field, value) {
+    await fetch('/api/update-status', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({order_id: orderId, field: field, value: value})
+    });
+    window.renderOrders();
+};
+
+window.downloadExcel = function() {
+    fetch('/api/orders').then(r=>r.json()).then(data => {
+        let rows = [["Row", "Date", "Order #", "Name", "Phone", "Email", "Address", "Total", "E-transfer", "Callback", "Notes"]];
+        data.forEach((o, idx) => {
+            rows.push([idx+1, o.date, o.id, o.name, o.phone, o.email, o.address, o.total.toFixed(2), o.etransfer, o.callback, o.notes]);
+        });
+        const csvContent = rows.map(r => r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(",")).join("\n");
+        const blob = new Blob([csvContent], {type: 'text/csv'});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = "orders-by-order.csv"; a.click();
+    });
+};
+
+setTimeout(window.renderOrders, 500);
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dialog id="accountDlg" style="border-radius:16px; padding:24px; max-width:450px; width:90vw; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height:90vh; overflow-y:auto;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <h2 style="margin:0;">Your account</h2>
+    <button type="button" onclick="document.getElementById('accountDlg').close()" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+  </div>
+  
+  <div style="display:flex; gap:10px; margin-bottom:20px;">
+      <button type="button" id="tabSignIn" class="primary" style="flex:1; padding:10px;">Sign in</button>
+      <button type="button" id="tabRegister" style="flex:1; padding:10px; background:white; color:var(--ink); border:1px solid var(--border);">Create account</button>
+  </div>
+
+  <form id="authForm">
+    
+    
+    
+    <div id="registerFields" style="display:none; background:#faf7f0; padding:15px; border-radius:8px; margin-bottom:15px;">
+        <p style="margin:0 0 10px 0; font-size:13px; color:var(--dim); font-weight:bold;">Help us cater to you better (Optional).</p>
+        
+        <label style="display:block; margin-bottom:8px; font-size:13px;">Full Name <input type="text" id="regName" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <label style="flex:1; font-size:13px;">Mobile Phone <input type="tel" id="regMobile" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+            <label style="flex:1; font-size:13px;">Home Phone <input type="tel" id="regHome" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        </div>
+        
+        <label style="display:block; margin-bottom:8px; font-size:13px;">Delivery Address <input type="text" id="regAddress" placeholder="Street, City, Postal Code" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        
+        <label style="display:block; margin-bottom:8px; font-size:13px;">What do you usually buy? <input type="text" id="regPrefs" placeholder="e.g., Kitchen gadgets, Snow gear" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        
+        <p style="margin:10px 0 5px 0; font-size:12px; color:var(--dim);">Social Media & Web (For exclusive deals)</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <label style="font-size:12px;">Instagram <input type="text" id="regIG" placeholder="@handle" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+            <label style="font-size:12px;">TikTok <input type="text" id="regTT" placeholder="@handle" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+            <label style="font-size:12px;">Facebook <input type="text" id="regFB" placeholder="Profile Link" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+            <label style="font-size:12px;">LinkedIn <input type="text" id="regLI" placeholder="Profile Link" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        </div>
+        <label style="display:block; margin-top:8px; font-size:12px;">Business Website <input type="url" id="regWeb" placeholder="https://" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+    </div>
+    
+<label style="display:block; margin-bottom:12px; font-weight:600; font-size:14px;">Email address
+      <input type="email" id="authEmail" required style="width:100%; padding:12px; margin-top:6px; border-radius:8px; border:1px solid var(--border); font-size:16px;">
+    </label>
+    <label style="display:block; margin-bottom:12px; font-weight:600; font-size:14px;">Password
+      <input type="password" id="authPass" required style="width:100%; padding:12px; margin-top:6px; border-radius:8px; border:1px solid var(--border); font-size:16px;">
+    </label>
+    <p id="authError" style="color:red; font-size:13px; margin:0 0 10px 0; display:none;"></p>
+    <button type="submit" class="primary" id="authSubmitBtn" style="width:100%; padding:14px; font-weight:bold; font-size:16px; border-radius:8px;">Sign in</button>
+  </form>
+  
+  <p style="margin-top:15px; text-align:center;"><a href="#" id="forgotLink" style="color:var(--dim); font-size:14px; text-decoration:underline;">Forgot your password?</a></p>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const signInBtn = document.getElementById('signInBtn');
+    const accountDlg = document.getElementById('accountDlg');
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabRegister = document.getElementById('tabRegister');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const form = document.getElementById('authForm');
+    const errorText = document.getElementById('authError');
+    const regFields = document.getElementById('registerFields');
+    let authMode = 'login';
+
+    if(signInBtn) signInBtn.onclick = () => { accountDlg.showModal(); errorText.style.display = 'none'; };
+
+    tabSignIn.onclick = () => {
+        authMode = 'login'; tabSignIn.className = 'primary'; tabSignIn.style.background = '';
+        tabRegister.className = ''; tabRegister.style.background = 'white';
+        submitBtn.innerText = 'Sign in'; errorText.style.display = 'none'; regFields.style.display = 'none';
+    };
+    
+    tabRegister.onclick = () => {
+        authMode = 'register'; tabRegister.className = 'primary'; tabRegister.style.background = '';
+        tabSignIn.className = ''; tabSignIn.style.background = 'white';
+        submitBtn.innerText = 'Create account'; errorText.style.display = 'none'; regFields.style.display = 'block';
+    };
+
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value.trim();
+        const pass = document.getElementById('authPass').value.trim();
+        
+        let payload = {email: email, password: pass};
+        if(authMode === 'register') {
+            payload.name = document.getElementById('regName').value;
+            payload.phone = document.getElementById('regPhone').value;
+            payload.business = document.getElementById('regBusiness').value;
+            payload.socials = document.getElementById('regSocials').value;
+        }
+
+        const endpoint = authMode === 'login' ? '/api/login' : '/api/register';
+        submitBtn.innerText = 'Processing...'; errorText.style.display = 'none';
+
+        try {
+            const res = await fetch(endpoint, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if(data.status === 'success') { alert(data.message); accountDlg.close(); form.reset(); }
+            else { errorText.innerText = data.message; errorText.style.display = 'block'; }
+        } catch (err) { errorText.innerText = "Connection error."; errorText.style.display = 'block'; }
+        submitBtn.innerText = authMode === 'login' ? 'Sign in' : 'Create account';
+    };
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+// Bulletproof Animation Engine
+const animations = [
+    'animate-slide-up', 
+    'animate-slide-left', 
+    'animate-slide-right', 
+    'animate-zoom', 
+    'animate-rotate',
+    'animate-flip',
+    'animate-spin360'
+];
+
+function applyRandomAnimations() {
+    // Target everything, including the top cards
+    const elements = document.querySelectorAll('.banner, .tiers, .how, .talk, .controls, .card');
+    
+    elements.forEach(el => {
+        // Reset everything
+        el.classList.remove(...animations, 'flow-active');
+        el.style.opacity = '0'; 
+        observer.observe(el);
+    });
+}
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        const el = entry.target;
+        
+        if (entry.isIntersecting) {
+            // 1. Pick a random outer animation
+            const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+            el.style.animationDelay = `${Math.random() * 0.1}s`;
+            el.style.opacity = '1';
+            el.classList.add(randomAnim);
+
+            // 2. If it's the banner or tiers, trigger the internal text flow
+            if (el.classList.contains('banner') || el.classList.contains('tiers')) {
+                // Slight delay so the outer animation starts before the text flows
+                setTimeout(() => el.classList.add('flow-active'), 100);
+            }
+
+        } else {
+            // Reset when it leaves the screen completely
+            el.style.opacity = '0';
+            el.classList.remove(...animations);
+            if (el.classList.contains('banner') || el.classList.contains('tiers')) {
+                el.classList.remove('flow-active');
+            }
+        }
+    });
+}, { threshold: 0.1 }); // 10% visibility triggers the animation
+
+// Re-run on load
+const originalRender = window.render;
+window.render = function() {
+    if (originalRender) originalRender();
+    setTimeout(applyRandomAnimations, 50); 
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof render === 'function') render();
+    if (typeof renderOrders === 'function') renderOrders();
+    setTimeout(applyRandomAnimations, 100);
+});
+</script>
+
+
+<script>
+// ADMIN PANEL STATIC FETCH OVERRIDE
+window.loadData = async function() {
+    // Load Users
+    let users = JSON.parse(localStorage.getItem('ibiz-users') || '[]');
+    const uRes = document.getElementById('usersTable').querySelector('tbody');
+    if(uRes) {
+        uRes.innerHTML = users.map(u => `
+            <tr>
+                <td>${u.email}</td><td>${u.name || ''}</td><td>${u.mobile || ''}</td>
+                <td>${u.prefs || ''}</td><td>IG: ${u.ig || ''}</td>
+            </tr>
+        `).join('');
+    }
+    
+    // Load Orders
+    let orders = JSON.parse(localStorage.getItem('ibiz-orders') || '[]');
+    const oRes = document.getElementById('ordersTable').querySelector('tbody');
+    if(oRes) {
+        oRes.innerHTML = orders.map(o => `
+            <tr><td>${o.date}</td><td>#${o.id}</td><td>${o.name}</td><td>${o.phone}</td>
+            <td>${o.items.map(i => i.name + ' x' + i.qty).join('<br>')}</td><td>$${o.total.toFixed(2)}</td></tr>
+        `).join('');
+    }
+}
+</script>
+
+</body>
+</html>
