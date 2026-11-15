@@ -1011,57 +1011,7 @@ setTimeout(window.renderOrders, 500);
 
 
 
-<dialog id="accountDlg" style="border-radius:16px; padding:24px; max-width:450px; width:90vw; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height:90vh; overflow-y:auto;">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-    <h2 style="margin:0;">Your account</h2>
-    <button type="button" onclick="document.getElementById('accountDlg').close()" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
-  </div>
-  
-  <div style="display:flex; gap:10px; margin-bottom:20px;">
-      <button type="button" id="tabSignIn" class="primary" style="flex:1; padding:10px;">Sign in</button>
-      <button type="button" id="tabRegister" style="flex:1; padding:10px; background:white; color:var(--ink); border:1px solid var(--border);">Create account</button>
-  </div>
 
-  <form id="authForm">
-    
-    
-    
-    <div id="registerFields" style="display:none; background:#faf7f0; padding:15px; border-radius:8px; margin-bottom:15px;">
-        <p style="margin:0 0 10px 0; font-size:13px; color:var(--dim); font-weight:bold;">Help us cater to you better (Optional).</p>
-        
-        <label style="display:block; margin-bottom:8px; font-size:13px;">Full Name <input type="text" id="regName" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-        
-        <div style="display:flex; gap:8px; margin-bottom:8px;">
-            <label style="flex:1; font-size:13px;">Mobile Phone <input type="tel" id="regMobile" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-            <label style="flex:1; font-size:13px;">Home Phone <input type="tel" id="regHome" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-        </div>
-        
-        <label style="display:block; margin-bottom:8px; font-size:13px;">Delivery Address <input type="text" id="regAddress" placeholder="Street, City, Postal Code" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-        
-        <label style="display:block; margin-bottom:8px; font-size:13px;">What do you usually buy? <input type="text" id="regPrefs" placeholder="e.g., Kitchen gadgets, Snow gear" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-        
-        <p style="margin:10px 0 5px 0; font-size:12px; color:var(--dim);">Social Media & Web (For exclusive deals)</p>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <label style="font-size:12px;">Instagram <input type="text" id="regIG" placeholder="@handle" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-            <label style="font-size:12px;">TikTok <input type="text" id="regTT" placeholder="@handle" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-            <label style="font-size:12px;">Facebook <input type="text" id="regFB" placeholder="Profile Link" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-            <label style="font-size:12px;">LinkedIn <input type="text" id="regLI" placeholder="Profile Link" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-        </div>
-        <label style="display:block; margin-top:8px; font-size:12px;">Business Website <input type="url" id="regWeb" placeholder="https://" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
-    </div>
-    
-<label style="display:block; margin-bottom:12px; font-weight:600; font-size:14px;">Email address
-      <input type="email" id="authEmail" required style="width:100%; padding:12px; margin-top:6px; border-radius:8px; border:1px solid var(--border); font-size:16px;">
-    </label>
-    <label style="display:block; margin-bottom:12px; font-weight:600; font-size:14px;">Password
-      <input type="password" id="authPass" required style="width:100%; padding:12px; margin-top:6px; border-radius:8px; border:1px solid var(--border); font-size:16px;">
-    </label>
-    <p id="authError" style="color:red; font-size:13px; margin:0 0 10px 0; display:none;"></p>
-    <button type="submit" class="primary" id="authSubmitBtn" style="width:100%; padding:14px; font-weight:bold; font-size:16px; border-radius:8px;">Sign in</button>
-  </form>
-  
-  <p style="margin-top:15px; text-align:center;"><a href="#" id="forgotLink" style="color:var(--dim); font-size:14px; text-decoration:underline;">Forgot your password?</a></p>
-</dialog>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -1233,6 +1183,274 @@ window.loadData = async function() {
         `).join('');
     }
 }
+</script>
+
+
+
+
+<script>
+// Wait for Firebase to load before overriding the buttons
+window.addEventListener('load', () => {
+    const authForm = document.getElementById('authForm');
+    const checkoutForm = document.getElementById('checkoutForm');
+
+    // 1. OVERRIDE REGISTRATION & LOGIN
+    if(authForm) {
+        const newForm = authForm.cloneNode(true);
+        authForm.parentNode.replaceChild(newForm, authForm);
+        
+        newForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const errorText = document.getElementById('authError');
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPass').value.trim();
+            const isRegister = document.getElementById('tabRegister').classList.contains('primary');
+            
+            submitBtn.innerText = 'Processing...'; errorText.style.display = 'none';
+
+            try {
+                if (isRegister) {
+                    const userCred = await window.fbCreateUser(window.firebaseAuth, email, pass);
+                    const user = userCred.user;
+                    // Save extra data to Firestore
+                    await window.fbSetDoc(window.fbDoc(window.firebaseDb, "users", user.uid), {
+                        email: email,
+                        name: document.getElementById('regName').value,
+                        mobile: document.getElementById('regMobile').value,
+                        home_phone: document.getElementById('regHome').value,
+                        address: document.getElementById('regAddress').value,
+                        prefs: document.getElementById('regPrefs').value,
+                        ig: document.getElementById('regIG').value,
+                        tt: document.getElementById('regTT').value,
+                        fb: document.getElementById('regFB').value,
+                        li: document.getElementById('regLI').value,
+                        web: document.getElementById('regWeb').value,
+                        joined: new Date().toISOString()
+                    });
+                    alert("Account created in the cloud! Welcome.");
+                } else {
+                    await window.fbSignIn(window.firebaseAuth, email, pass);
+                    alert("Logged in successfully!");
+                }
+                document.getElementById('accountDlg').close();
+                newForm.reset();
+            } catch (err) {
+                errorText.innerText = err.message.replace("Firebase: ", "");
+                errorText.style.display = 'block';
+            }
+            submitBtn.innerText = isRegister ? 'Create account' : 'Sign in';
+        });
+    }
+
+    // 2. OVERRIDE CHECKOUT (ORDERS)
+    const observer = new MutationObserver(() => {
+        const cForm = document.getElementById('checkoutForm');
+        if(cForm && !cForm.dataset.fbBound) {
+            cForm.dataset.fbBound = 'true';
+            const originalSubmit = cForm.onsubmit;
+            
+            cForm.onsubmit = async (e) => {
+                e.preventDefault();
+                // Call original function to generate the order object 'o'
+                if(originalSubmit) originalSubmit.call(cForm, e);
+                
+                // Grab the order from local storage (created by the original script)
+                let orders = JSON.parse(localStorage.getItem('ibiz-orders') || '[]');
+                let latestOrder = orders[orders.length - 1];
+                
+                if(latestOrder) {
+                    try {
+                        await window.fbAddDoc(window.fbCollection(window.firebaseDb, "orders"), latestOrder);
+                        console.log("Order synced to cloud!");
+                    } catch(err) { console.error("Cloud sync failed", err); }
+                }
+            };
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+});
+</script>
+
+
+<dialog id="accountDlg" style="border-radius:16px; padding:24px; max-width:450px; width:90vw; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height:90vh; overflow-y:auto;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <h2 style="margin:0;">Your account</h2>
+    <button type="button" onclick="document.getElementById('accountDlg').close()" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+  </div>
+  
+  <div style="display:flex; gap:10px; margin-bottom:20px;">
+      <button type="button" id="tabSignIn" class="primary" style="flex:1; padding:10px;">Sign in</button>
+      <button type="button" id="tabRegister" style="flex:1; padding:10px; background:white; color:var(--ink); border:1px solid var(--border);">Create account</button>
+  </div>
+
+  <form id="authForm">
+    <div id="registerFields" style="display:none; background:#faf7f0; padding:15px; border-radius:8px; margin-bottom:15px;">
+        <p style="margin:0 0 10px 0; font-size:13px; color:var(--dim); font-weight:bold;">Help us cater to you better (Optional).</p>
+        <label style="display:block; margin-bottom:8px; font-size:13px;">Full Name <input type="text" id="regName" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <label style="flex:1; font-size:13px;">Mobile Phone <input type="tel" id="regMobile" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+            <label style="flex:1; font-size:13px;">Home Phone <input type="tel" id="regHome" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        </div>
+        <label style="display:block; margin-bottom:8px; font-size:13px;">Delivery Address <input type="text" id="regAddress" placeholder="Street, City, Postal Code" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        <label style="display:block; margin-bottom:8px; font-size:13px;">What do you usually buy? <input type="text" id="regPrefs" placeholder="e.g., Kitchen gadgets, Snow gear" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        <p style="margin:10px 0 5px 0; font-size:12px; color:var(--dim);">Social Media & Web (For exclusive deals)</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <label style="font-size:12px;">Instagram <input type="text" id="regIG" placeholder="@handle" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+            <label style="font-size:12px;">TikTok <input type="text" id="regTT" placeholder="@handle" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+            <label style="font-size:12px;">Facebook <input type="text" id="regFB" placeholder="Profile Link" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+            <label style="font-size:12px;">LinkedIn <input type="text" id="regLI" placeholder="Profile Link" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+        </div>
+        <label style="display:block; margin-top:8px; font-size:12px;">Business Website <input type="url" id="regWeb" placeholder="https://" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border);"></label>
+    </div>
+
+    <label style="display:block; margin-bottom:12px; font-weight:600; font-size:14px;">Email address
+      <input type="email" id="authEmail" required style="width:100%; padding:12px; margin-top:6px; border-radius:8px; border:1px solid var(--border); font-size:16px;">
+    </label>
+    <label style="display:block; margin-bottom:12px; font-weight:600; font-size:14px;">Password
+      <input type="password" id="authPass" required style="width:100%; padding:12px; margin-top:6px; border-radius:8px; border:1px solid var(--border); font-size:16px;">
+    </label>
+    <p id="authError" style="color:red; font-size:13px; margin:0 0 10px 0; display:none;"></p>
+    <button type="submit" class="primary" id="authSubmitBtn" style="width:100%; padding:14px; font-weight:bold; font-size:16px; border-radius:8px;">Sign in</button>
+  </form>
+</dialog>
+
+
+<!-- FIREBASE CLOUD INTEGRATION -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, doc, setDoc, addDoc, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBM32TG6VGty0Prnn1JWu3Y76C31irmeBk",
+    authDomain: "ibizshop-66aa3.firebaseapp.com",
+    projectId: "ibizshop-66aa3",
+    storageBucket: "ibizshop-66aa3.firebasestorage.app",
+    messagingSenderId: "450975109972",
+    appId: "1:450975109972:web:0b99db65de259524232ec1",
+    measurementId: "G-SRLR2HKVBG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Expose to window for the non-module script
+  window.fbAuth = auth;
+  window.fbDb = db;
+  window.fbCreateUser = createUserWithEmailAndPassword;
+  window.fbSignIn = signInWithEmailAndPassword;
+  window.fbDoc = doc;
+  window.fbSetDoc = setDoc;
+  window.fbAddDoc = addDoc;
+  window.fbCollection = collection;
+  
+  console.log("🔥 Firebase Connected!");
+</script>
+
+<script>
+window.addEventListener('load', () => {
+    const accountDlg = document.getElementById('accountDlg');
+    const signInBtn = document.getElementById('signInBtn');
+    const tabSignIn = document.getElementById('tabSignIn');
+    const tabRegister = document.getElementById('tabRegister');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const form = document.getElementById('authForm');
+    const errorText = document.getElementById('authError');
+    const regFields = document.getElementById('registerFields');
+    let authMode = 'login';
+
+    if(signInBtn) signInBtn.onclick = () => { accountDlg.showModal(); errorText.style.display = 'none'; };
+
+    // Tab Switching Logic
+    tabSignIn.onclick = () => {
+        authMode = 'login'; 
+        tabSignIn.className = 'primary'; tabSignIn.style.background = '';
+        tabRegister.className = ''; tabRegister.style.background = 'white';
+        submitBtn.innerText = 'Sign in'; 
+        errorText.style.display = 'none'; 
+        regFields.style.display = 'none';
+    };
+    
+    tabRegister.onclick = () => {
+        authMode = 'register'; 
+        tabRegister.className = 'primary'; tabRegister.style.background = '';
+        tabSignIn.className = ''; tabSignIn.style.background = 'white';
+        submitBtn.innerText = 'Create account'; 
+        errorText.style.display = 'none'; 
+        regFields.style.display = 'block'; // SHOW THE FIELDS
+    };
+
+    // Form Submission (Firebase)
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value.trim();
+        const pass = document.getElementById('authPass').value.trim();
+        
+        submitBtn.innerText = 'Processing...'; errorText.style.display = 'none';
+
+        try {
+            if (authMode === 'register') {
+                // 1. Create User in Firebase Auth
+                const userCred = await window.fbCreateUser(window.fbAuth, email, pass);
+                const user = userCred.user;
+                
+                // 2. Save full profile to Firestore
+                await window.fbSetDoc(window.fbDoc(window.fbDb, "users", user.uid), {
+                    email: email,
+                    name: document.getElementById('regName').value,
+                    mobile: document.getElementById('regMobile').value,
+                    home_phone: document.getElementById('regHome').value,
+                    address: document.getElementById('regAddress').value,
+                    prefs: document.getElementById('regPrefs').value,
+                    ig: document.getElementById('regIG').value,
+                    tt: document.getElementById('regTT').value,
+                    fb: document.getElementById('regFB').value,
+                    li: document.getElementById('regLI').value,
+                    web: document.getElementById('regWeb').value,
+                    joined: new Date().toISOString()
+                });
+                alert("Account created in the cloud! Check Firebase.");
+            } else {
+                // Login
+                await window.fbSignIn(window.fbAuth, email, pass);
+                alert("Logged in successfully!");
+            }
+            accountDlg.close();
+            form.reset();
+        } catch (err) {
+            errorText.innerText = err.message.replace("Firebase: ", "");
+            errorText.style.display = 'block';
+        }
+        submitBtn.innerText = authMode === 'login' ? 'Sign in' : 'Create account';
+    };
+
+    // Override Checkout for Firebase Orders
+    const observer = new MutationObserver(() => {
+        const cForm = document.getElementById('checkoutForm');
+        if(cForm && !cForm.dataset.fbBound) {
+            cForm.dataset.fbBound = 'true';
+            const originalSubmit = cForm.onsubmit;
+            
+            cForm.onsubmit = async (e) => {
+                e.preventDefault();
+                if(originalSubmit) originalSubmit.call(cForm, e);
+                
+                let orders = JSON.parse(localStorage.getItem('ibiz-orders') || '[]');
+                let latestOrder = orders[orders.length - 1];
+                
+                if(latestOrder) {
+                    try {
+                        await window.fbAddDoc(window.fbCollection(window.fbDb, "orders"), latestOrder);
+                        console.log("Order synced to cloud!");
+                    } catch(err) { console.error("Cloud sync failed", err); }
+                }
+            };
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+});
 </script>
 
 </body>
