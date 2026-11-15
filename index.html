@@ -1349,7 +1349,14 @@ window.addEventListener('load', () => {
   console.log("🔥 Firebase Connected!");
 </script>
 
+
+
+
 <script>
+// Clear old test data that makes it say "already logged in"
+localStorage.removeItem('ibiz-user');
+localStorage.removeItem('ibiz-orders');
+
 window.addEventListener('load', () => {
     const accountDlg = document.getElementById('accountDlg');
     const signInBtn = document.getElementById('signInBtn');
@@ -1363,93 +1370,65 @@ window.addEventListener('load', () => {
 
     if(signInBtn) signInBtn.onclick = () => { accountDlg.showModal(); errorText.style.display = 'none'; };
 
-    // Tab Switching Logic
     tabSignIn.onclick = () => {
-        authMode = 'login'; 
-        tabSignIn.className = 'primary'; tabSignIn.style.background = '';
-        tabRegister.className = ''; tabRegister.style.background = 'white';
-        submitBtn.innerText = 'Sign in'; 
-        errorText.style.display = 'none'; 
-        regFields.style.display = 'none';
+        authMode = 'login'; tabSignIn.className = 'primary'; tabSignIn.style.background = ''; tabRegister.className = ''; tabRegister.style.background = 'white'; submitBtn.innerText = 'Sign in'; errorText.style.display = 'none'; regFields.style.display = 'none';
     };
     
     tabRegister.onclick = () => {
-        authMode = 'register'; 
-        tabRegister.className = 'primary'; tabRegister.style.background = '';
-        tabSignIn.className = ''; tabSignIn.style.background = 'white';
-        submitBtn.innerText = 'Create account'; 
-        errorText.style.display = 'none'; 
-        regFields.style.display = 'block'; // SHOW THE FIELDS
+        authMode = 'register'; tabRegister.className = 'primary'; tabRegister.style.background = ''; tabSignIn.className = ''; tabSignIn.style.background = 'white'; submitBtn.innerText = 'Create account'; errorText.style.display = 'none'; regFields.style.display = 'block';
     };
 
-    // Form Submission (Firebase)
     form.onsubmit = async (e) => {
         e.preventDefault();
-        const email = document.getElementById('authEmail').value.trim();
-        const pass = document.getElementById('authPass').value.trim();
         
-        submitBtn.innerText = 'Processing...'; errorText.style.display = 'none';
+        // Force it to register if they submit
+        if (authMode === 'login') {
+            tabRegister.click(); // Switch to register tab automatically
+            return;
+        }
+
+        const email = document.getElementById('authEmail').value.trim();
+        const submitBtn = document.getElementById('authSubmitBtn');
+        const errorText = document.getElementById('authError');
+
+        submitBtn.innerText = 'Saving to Cloud...'; 
+        errorText.style.display = 'none';
+
+        const payload = {
+            name: document.getElementById('regName').value,
+            email: email,
+            mobile: document.getElementById('regMobile').value,
+            address: document.getElementById('regAddress').value,
+            prefs: document.getElementById('regPrefs').value,
+            ig: document.getElementById('regIG').value,
+            tt: document.getElementById('regTT').value
+        };
 
         try {
-            if (authMode === 'register') {
-                // 1. Create User in Firebase Auth
-                const userCred = await window.fbCreateUser(window.fbAuth, email, pass);
-                const user = userCred.user;
-                
-                // 2. Save full profile to Firestore
-                await window.fbSetDoc(window.fbDoc(window.fbDb, "users", user.uid), {
-                    email: email,
-                    name: document.getElementById('regName').value,
-                    mobile: document.getElementById('regMobile').value,
-                    home_phone: document.getElementById('regHome').value,
-                    address: document.getElementById('regAddress').value,
-                    prefs: document.getElementById('regPrefs').value,
-                    ig: document.getElementById('regIG').value,
-                    tt: document.getElementById('regTT').value,
-                    fb: document.getElementById('regFB').value,
-                    li: document.getElementById('regLI').value,
-                    web: document.getElementById('regWeb').value,
-                    joined: new Date().toISOString()
-                });
-                alert("Account created in the cloud! Check Firebase.");
-            } else {
-                // Login
-                await window.fbSignIn(window.fbAuth, email, pass);
-                alert("Logged in successfully!");
-            }
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); 
+
+            const response = await fetch("https://script.google.com/macros/s/AKfycbwNheZ9tfPncy8hbj1ahYgufDHw44Xkjvvpo0XAp8V8k_IPwA5erdcJHaUyRSiGjkyEyw/exec", {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(payload),
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error('Network error');
+
+            alert("Success! Account saved to your Google Sheet.");
             accountDlg.close();
             form.reset();
         } catch (err) {
-            errorText.innerText = err.message.replace("Firebase: ", "");
+            console.error(err);
+            errorText.innerText = err.name === 'AbortError' ? "Request timed out. Please try again." : "Failed to connect. Check script deployment.";
             errorText.style.display = 'block';
+        } finally {
+            submitBtn.innerText = 'Create account';
         }
-        submitBtn.innerText = authMode === 'login' ? 'Sign in' : 'Create account';
     };
-
-    // Override Checkout for Firebase Orders
-    const observer = new MutationObserver(() => {
-        const cForm = document.getElementById('checkoutForm');
-        if(cForm && !cForm.dataset.fbBound) {
-            cForm.dataset.fbBound = 'true';
-            const originalSubmit = cForm.onsubmit;
-            
-            cForm.onsubmit = async (e) => {
-                e.preventDefault();
-                if(originalSubmit) originalSubmit.call(cForm, e);
-                
-                let orders = JSON.parse(localStorage.getItem('ibiz-orders') || '[]');
-                let latestOrder = orders[orders.length - 1];
-                
-                if(latestOrder) {
-                    try {
-                        await window.fbAddDoc(window.fbCollection(window.fbDb, "orders"), latestOrder);
-                        console.log("Order synced to cloud!");
-                    } catch(err) { console.error("Cloud sync failed", err); }
-                }
-            };
-        }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
 });
 </script>
 
