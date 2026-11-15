@@ -1433,6 +1433,9 @@ window.addEventListener('load', () => {
 </script>
 
 
+
+
+
 <script>
 window.addEventListener('load', () => {
     const accountDlg = document.getElementById('accountDlg');
@@ -1478,8 +1481,7 @@ window.addEventListener('load', () => {
         };
 
         try {
-            // Using mode: 'no-cors' tells the browser to send the data and NOT wait for a reply.
-            // This completely bypasses the Google CORS error.
+            // mode: 'no-cors' prevents the browser from hanging while waiting for Google's reply
             await fetch("https://script.google.com/macros/s/AKfycbwNheZ9tfPncy8hbj1ahYgufDHw44Xkjvvpo0XAp8V8k_IPwA5erdcJHaUyRSiGjkyEyw/exec", {
                 method: 'POST',
                 mode: 'no-cors', 
@@ -1487,7 +1489,6 @@ window.addEventListener('load', () => {
                 body: JSON.stringify(payload)
             });
 
-            // Since we bypassed the reply, we just assume success if it didn't crash.
             alert("Success! Account saved to Google Sheets and welcome email sent.");
             accountDlg.close();
             form.reset();
