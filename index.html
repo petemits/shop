@@ -488,6 +488,47 @@
 
 </style>
 
+
+<style>
+  /* FULL SCREEN BACKGROUND & OVERLAY */
+  body {
+    background-color: #1c1917;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2; 
+    background-image: url('assets/products/p41.jpeg'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; 
+    background: rgba(250, 247, 240, 0.88); /* The overlay tint */
+    backdrop-filter: blur(6px); 
+  }
+
+  header, main, footer {
+    position: relative;
+    z-index: 1;
+  }
+</style>
+
 </head>
 <body>
 <header>
