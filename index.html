@@ -495,6 +495,9 @@
 
 
 
+
+
+
 <style>
   /* VIDEO BACKGROUND */
   #bg-video {
@@ -508,16 +511,30 @@
     transform: translate(-50%, -50%);
     z-index: -2;
     object-fit: cover;
-    opacity: 1;
+    opacity: 0.9;
   }
 
-  
+  /* DARK TINT OVERLAY */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(0, 0, 0, 0.6));
+    z-index: -1;
+    pointer-events: none;
+  }
 
   /* GLASSY HEADER */
   header {
-    background: rgba(250, 247, 240, 0.8) !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    color: white !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+  
+  header .brand b, header .brand span {
+    color: white !important;
   }
 </style>
 
