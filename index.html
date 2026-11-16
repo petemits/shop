@@ -492,50 +492,49 @@
 
 
 
+
+
+
 <style>
-  /* 1. THE BACKGROUND IMAGE */
-  body {
-    background-color: #1c1917 !important;
-    background-image: url('assets/products/p41.jpeg') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-attachment: fixed !important;
-    background-repeat: no-repeat !important;
-    min-height: 100vh;
+  /* VIDEO BACKGROUND */
+  #bg-video {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: -2;
+    object-fit: cover;
+    opacity: 0.8;
   }
 
-  /* 2. THE TINT OVERLAY (So text doesn't get lost) */
+  /* THE TINT OVERLAY */
   body::before {
     content: "";
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
-    background: linear-gradient(135deg, rgba(250, 247, 240, 0.7), rgba(20, 83, 45, 0.3));
+    background: linear-gradient(135deg, rgba(250, 247, 240, 0.85), rgba(20, 83, 45, 0.4));
     z-index: -1;
     pointer-events: none;
   }
 
-  /* 3. MAKE THE HEADER GLASSY */
+  /* GLASSY HEADER */
   header {
-    background: rgba(250, 247, 240, 0.75) !important;
+    background: rgba(250, 247, 240, 0.8) !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
-    border-bottom: 1px solid rgba(227, 220, 201, 0.5) !important;
-  }
-
-  /* 4. MAKE SURE CONTENT IS ALWAYS VISIBLE (Fixes the blank screen bug) */
-  .animate-in, .card, main, .banner, .tiers {
-    opacity: 1 !important; 
-    transform: translateY(0) !important;
-  }
-
-  /* 5. FIX THE FONTS & COLORS FOR CONTRAST */
-  h1, h2, h3, b {
-    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
   }
 </style>
 
 </head>
 <body>
+<video autoplay loop muted playsinline id="bg-video">
+  <source src="assets/background_video.mp4" type="video/mp4">
+</video>
+
 <header>
   <div class="brand"><b>iBiz Gadget Shop</b><span>Everyday home gadgets · Toronto · Mississauga · Brampton</span></div>
   
